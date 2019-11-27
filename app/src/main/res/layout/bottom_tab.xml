@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="1dp"
+    android:background="@color/colorGray"
+    android:orientation="horizontal">
+
+
+    <com.example.leisure.widget.GradualTabView
+        android:id="@+id/gtv_recommend"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        app:icon="@drawable/find"
+        app:icon_selected="@drawable/find_select"
+        app:text="推荐"
+        app:text_end_color="@color/textEndColor"
+        app:text_start_color="@color/textStartColor" />
+
+    <com.example.leisure.widget.GradualTabView
+        android:id="@+id/gtv_fiction"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        app:icon="@drawable/find"
+        app:icon_selected="@drawable/find_select"
+        app:text="小说"
+        app:text_end_color="@color/textEndColor"
+        app:text_start_color="@color/textStartColor" />
+
+    <com.example.leisure.widget.GradualTabView
+        android:id="@+id/gtv_music"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        app:icon="@drawable/find"
+        app:icon_selected="@drawable/find_select"
+        app:text="音乐"
+        app:text_end_color="@color/textEndColor"
+        app:text_start_color="@color/textStartColor" />
+
+    <com.example.leisure.widget.GradualTabView
+        android:id="@+id/gtv_video"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        app:icon="@drawable/find"
+        app:icon_selected="@drawable/find_select"
+        app:text="视频"
+        app:text_end_color="@color/textEndColor"
+        app:text_start_color="@color/textStartColor" />
+
+
+</LinearLayout>
+

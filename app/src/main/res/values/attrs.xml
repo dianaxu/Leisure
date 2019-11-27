@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="GradualTabView">
+        <attr name="text_start_color" format="color" />   <!--文字开始颜色-->
+        <attr name="text_end_color" format="color" />   <!--文字结束颜色-->
+        <attr name="text" format="string" />       <!---->
+        <attr name="icon" format="reference" />       <!--进度颜色-->
+        <attr name="icon_selected" format="reference" />  <!--进度开始颜色-->
+    </declare-styleable>
+</resources>
