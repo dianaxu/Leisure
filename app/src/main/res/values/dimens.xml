@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="tabbarH">56dp</dimen>
+    <dimen name="margin">16dp</dimen>
+    <dimen name="imagePadding">8dp</dimen>
+    <dimen name="lineH">1dp</dimen>
+    <dimen name="line5H">5dp</dimen>
+    <dimen name="detailH">150dp</dimen>
+    <dimen name="shapS">5dp</dimen>
+
+    <dimen name="tabbarTextS">16sp</dimen>
+    <dimen name="itemTitleS">16sp</dimen>
+    <dimen name="itemDesS">12sp</dimen>
+
+    <dimen name="textShadowDx">5</dimen>
+    <dimen name="textShadowDy">5</dimen>
+    <dimen name="shadowRadius">5</dimen>
+</resources>

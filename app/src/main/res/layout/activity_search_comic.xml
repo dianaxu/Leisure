@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <com.example.leisure.widget.CommonToolbar
+        android:id="@+id/ctb_header"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/tabbarH"
+        android:background="@color/toolbarBlueBg"
+        app:toolbar_left_drawable="@drawable/selector_back"
+        app:toolbar_text="搜索漫画"
+        app:toolbar_text_color="@color/loginTextColor" />
+
+    <!--    搜索框-->
+    <include
+        layout="@layout/merge_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/margin"
+        android:layout_marginTop="@dimen/imagePadding"
+        android:layout_marginRight="@dimen/margin"
+        android:layout_marginBottom="@dimen/imagePadding" />
+
+    <!--    最近搜索-->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_old_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin"
+        android:visibility="visible" />
+
+    <!--    搜索结果-->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_result"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+</LinearLayout>

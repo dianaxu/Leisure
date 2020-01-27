@@ -1,4 +1,4 @@
-package com.example.leisure;
+package com.example.leisure.activity;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -6,13 +6,13 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.leisure.fragment.FictionFragment;
+import com.example.leisure.R;
+import com.example.leisure.fragment.BookShelfFragment;
+import com.example.leisure.fragment.ComicFragment;
 import com.example.leisure.fragment.LeftMenuFragment;
-import com.example.leisure.fragment.MusicFragment;
-import com.example.leisure.fragment.RecommendFragment;
-import com.example.leisure.fragment.VideoFragment;
 import com.example.leisure.util.ScreenInfoUtils;
 import com.example.leisure.widget.GradualTabView;
 import com.nineoldandroids.view.ViewHelper;
@@ -35,19 +35,20 @@ import androidx.viewpager.widget.ViewPager;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     public static final String BUNDLE_KEY_POS = "bundle_key_pos";
     private final String TAG = "MainActivity";
 
     private View mStatusbar;
     private Toolbar mToolbar;
     private TextView mTvTitle;
+    private ImageView mIvSearch;
     private DrawerLayout mDrawerLayout;
     private View mLeftMenu;
     private ViewPager mVpContent;
-    private GradualTabView mGtvRecommend, mGtvFiction, mGtvMusic, mGtvVideo;
+    private GradualTabView mGtvBookshelf, mGtvComic;
 
-    private List<String> mTabTitles = new ArrayList<>(Arrays.asList("推荐", "小说", "音乐", "视频"));
+    private List<String> mTabTitles = new ArrayList<>();
     private SparseArray<Fragment> mTabFragments = new SparseArray();
     private List<GradualTabView> mGradualTabViews = new ArrayList<>();
     private int mSavePosition;
@@ -75,10 +76,12 @@ public class MainActivity extends AppCompatActivity {
         initGradualTabView();
 
         //设置导航图标
-        mToolbar.setNavigationIcon(R.drawable.ic_head);
+        mToolbar.setNavigationIcon(R.drawable.ic_header);
         //隐藏原标题
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         setToolbarTitle(0);
+
+        setCurrrentTab(0);
     }
 
     @Override
@@ -92,10 +95,8 @@ public class MainActivity extends AppCompatActivity {
      * 初始化底部导航栏
      */
     private void initGradualTabView() {
-        mGradualTabViews.add(mGtvRecommend);
-        mGradualTabViews.add(mGtvFiction);
-        mGradualTabViews.add(mGtvMusic);
-        mGradualTabViews.add(mGtvVideo);
+        mGradualTabViews.add(mGtvBookshelf);
+        mGradualTabViews.add(mGtvComic);
 
         int sie = mGradualTabViews.size();
         for (int i = 0; i < sie; i++) {
@@ -107,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
                     mVpContent.setCurrentItem(finalI, false);
                     setCurrrentTab(finalI);
                     setToolbarTitle(finalI);
+                    mIvSearch.setVisibility(finalI == 0 ? View.GONE : View.VISIBLE);
                 }
             });
         }
@@ -116,6 +118,9 @@ public class MainActivity extends AppCompatActivity {
      * 初始化ViewPager
      */
     private void initViewPagerAdapter() {
+        String[] tabTitles = getResources().getStringArray(R.array.array_tab_title);
+        mTabTitles = Arrays.asList(tabTitles);
+
         mVpContent.setOffscreenPageLimit(mTabTitles.size());
         mVpContent.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
             @Override
@@ -123,21 +128,14 @@ public class MainActivity extends AppCompatActivity {
                 Fragment fragment = null;
                 switch (position) {
                     case 0:
-                        fragment = new RecommendFragment();
+                        fragment = BookShelfFragment.newInstance();
                         break;
                     case 1:
-                        fragment = new FictionFragment();
-                        break;
-                    case 2:
-                        fragment = new MusicFragment();
-                        break;
-                    case 3:
-                        fragment = new VideoFragment();
+                        fragment = ComicFragment.newInstance();
                         break;
                     default:
                         break;
                 }
-
                 return fragment;
             }
 
@@ -181,6 +179,7 @@ public class MainActivity extends AppCompatActivity {
             public void onPageSelected(int position) {
                 mVpContent.setCurrentItem(position);
                 setToolbarTitle(position);
+                mIvSearch.setVisibility(position == 0 ? View.GONE : View.VISIBLE);
             }
 
             @Override
@@ -261,6 +260,7 @@ public class MainActivity extends AppCompatActivity {
      * 初始化Toolbar
      */
     private void initToolbar() {
+
         //将ToolBar与ActionBar关联
         setSupportActionBar(mToolbar);
 
@@ -289,21 +289,20 @@ public class MainActivity extends AppCompatActivity {
      * 初始化控件
      */
     private void initView() {
-        mStatusbar = findViewById(R.id.view_statusbar);
+        mStatusbar = findViewById(R.id.view_status_bar);
         mToolbar = findViewById(R.id.toolbar);
         mTvTitle = findViewById(R.id.tv_title);
+        mIvSearch = findViewById(R.id.iv_search);
 
         mDrawerLayout = findViewById(R.id.drawer_layout);
         mLeftMenu = findViewById(R.id.menu_frame);
 
         mVpContent = findViewById(R.id.vp_content);
 
-        mGtvRecommend = findViewById(R.id.gtv_recommend);
-        mGtvFiction = findViewById(R.id.gtv_fiction);
-        mGtvMusic = findViewById(R.id.gtv_music);
-        mGtvVideo = findViewById(R.id.gtv_video);
+        mGtvBookshelf = findViewById(R.id.gtv_bookshelf);
+        mGtvComic = findViewById(R.id.gtv_comic);
 
-
+        mIvSearch.setOnClickListener(this);
     }
 
 
@@ -332,5 +331,13 @@ public class MainActivity extends AppCompatActivity {
         mTvTitle.setText(mTabTitles.get(position));
     }
 
+    @Override
+    public void onClick(View v) {
+        int id = v.getId();
+        if (R.id.iv_search == id) {
+            //todo 在漫画页时 跳转到搜索页面
+            SearchComicActivity.startSearchComicActivity(this);
+        }
+    }
 }
 

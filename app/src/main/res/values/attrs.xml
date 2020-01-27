@@ -7,4 +7,16 @@
         <attr name="icon" format="reference" />       <!--进度颜色-->
         <attr name="icon_selected" format="reference" />  <!--进度开始颜色-->
     </declare-styleable>
+
+    <declare-styleable name="CommonToolbar">
+        <attr name="toolbar_left_drawable" format="reference" />   <!---->
+        <attr name="toolbar_right_drawable" format="reference" />   <!---->
+        <attr name="toolbar_text" format="string" />   <!---->
+        <attr name="toolbar_text_color" format="color" />   <!---->
+        <attr name="toolbar_text_size" format="integer" />   <!---->
+        <attr name="toolbar_search_enable" format="boolean" />   <!--是否显示搜索 默认不显示-->
+        <attr name="toolbar_search_hint" format="string" />  <!--搜索提示文字-->
+        <attr name="toolbar_text_enable" format="boolean" />  <!--是否文本搜索  默认显示-->
+    </declare-styleable>
+
 </resources>

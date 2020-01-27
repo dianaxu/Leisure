@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--    <item android:drawable="@drawable/thumb_pressed" android:state_pressed="true" />-->
+
+    <!--    <item android:drawable="@drawable/thumb" />-->
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+
+            <size android:width="24dp" android:height="60dp"></size>
+            <corners android:bottomLeftRadius="4dp" android:bottomRightRadius="4dp" android:topLeftRadius="4dp" android:topRightRadius="4dp" />
+            <solid android:color="@color/colorPrimaryDark" />
+
+        </shape>
+    </item>
+
+    <item>
+        <shape android:shape="rectangle">
+
+            <size android:width="24dp" android:height="60dp"></size>
+            <corners android:bottomLeftRadius="4dp" android:bottomRightRadius="4dp" android:topLeftRadius="4dp" android:topRightRadius="4dp" />
+            <solid android:color="@color/colorPrimary" />
+
+        </shape>
+    </item>
+
+</selector>

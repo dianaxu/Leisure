@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/iv_cover"
+        android:layout_width="70dp"
+        android:layout_height="90dp"
+        android:scaleType="fitCenter"
+        android:src="@mipmap/ic_launcher" />
+
+    <TextView
+        android:id="@+id/tv_name"
+        style="@style/ItemTitleStyle"
+        android:layout_marginLeft="@dimen/imagePadding"
+        android:layout_toRightOf="@id/iv_cover"
+        tools:text="绝世古尊" />
+
+    <TextView
+        android:id="@+id/tv_latest"
+        style="@style/ItemDesStyle"
+        android:layout_alignLeft="@id/tv_name"
+        android:layout_alignBottom="@id/iv_cover"
+        android:layout_toLeftOf="@id/tv_time"
+        tools:text="更新到 第47话大..大蒜！" />
+
+    <TextView
+        android:id="@+id/tv_time"
+        style="@style/ItemDesStyle"
+        android:layout_alignBottom="@id/tv_latest"
+        android:layout_alignParentRight="true"
+        tools:text="2020-01-05" />
+
+
+</RelativeLayout>

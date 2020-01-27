@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
@@ -7,12 +7,148 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
 
-
-
     </style>
+
+    <!--   全屏模式-->
+    <style name="MyTheme" parent="AppTheme">
+        <item name="android:windowNoTitle">true</item>//无标题
+        <item name="android:windowActionBar">false</item>//无ActionBar
+        <item name="android:windowFullscreen">true</item>//全屏即无通知栏
+        <item name="android:windowContentOverlay">@null</item>//是否有遮盖
+    </style>
+
 
     <style name="ToolbarOverflow" parent="@android:style/Widget.ActionButton.Overflow">
         <item name="android:src">@drawable/ic_back</item>
+    </style>
+
+    <style name="BottomTabGradualTabView">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="icon">@drawable/find</item>
+        <item name="icon_selected">@drawable/find_select</item>
+        <item name="text_end_color">@color/tabTextEndColor</item>
+        <item name="text_start_color">@color/tabTextStartColor</item>
+    </style>
+
+    <style name="BaseTextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textColor">@color/loginTextColor</item>
+        <item name="android:shadowColor">@color/textGrayShadow</item>
+        <item name="android:shadowDx">@dimen/textShadowDx</item>
+        <item name="android:shadowDy">@dimen/textShadowDy</item>
+        <item name="android:shadowRadius">@dimen/shadowRadius</item>
+    </style>
+
+    <style name="BaseTextView.BlueShadow" parent="BaseTextView">
+        <item name="android:shadowColor">@color/textBlueShadow</item>
+    </style>
+
+    <style name="BaseSelectorTextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textColor">@drawable/selector_text_color</item>
+        <item name="android:shadowColor">@color/textGrayShadow</item>
+        <item name="android:shadowDx">@dimen/textShadowDx</item>
+        <item name="android:shadowDy">@dimen/textShadowDy</item>
+        <item name="android:shadowRadius">@dimen/shadowRadius</item>
+    </style>
+
+
+    <style name="MyEditText" parent="Theme.AppCompat.Light">
+        <item name="colorControlNormal">@color/etNormalColor</item>
+        <item name="colorControlActivated">@color/etActivatedColor</item>
+    </style>
+
+    <style name="MyEditTextStyle">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">10dp</item>
+        <item name="android:textColor">@color/loginTextColor</item>
+        <item name="android:theme">@style/MyEditText</item>
+    </style>
+
+    <style name="MyStatusBar">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/lineH</item>
+        <item name="android:background">@color/statusBarBg</item>
+        <item name="android:orientation">horizontal</item>
+    </style>
+
+
+    <style name="TestSpinner">
+        <item name="android:textColor">@color/tabTextEndColor</item>
+        <item name="android:background">@color/textGrayShadow</item>
+        <!--        <item name="android:dropDownSelector">@color/colorffffff</item>-->
+        <!--确定Spinner的弹出方式，下拉跟dialog两种-->
+        <item name="android:spinnerMode">dropdown</item>
+        <!--修改spinner的背景边框样式-->
+        <item name="android:popupBackground">@color/toolbarBlueBg</item>
+        <item name="android:dropDownVerticalOffset">0dp</item>
+        <item name="android:dropDownHorizontalOffset">0dp</item>
+        <item name="android:dropDownWidth">wrap_content</item>
+        <!--        <item name="android:popupPromptView">@android:layout/simple_dropdown_hint</item>-->
+    </style>
+
+
+    <!--设置分割线-->
+    <style name="spinnerListStyle" parent="@android:style/Widget.ListView.DropDown">
+        <item name="android:divider">@color/toolbarBlueBg</item>
+        <item name="android:dividerHeight">1dp</item>
+    </style>
+
+
+    <!--设置文本颜色 和大小-->
+    <style name="itemSpinnerStyle" parent="BaseTextView">
+        <item name="android:textColor">@drawable/selector_text_color</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+
+    <style name="TestSpinner1">
+        <item name="android:spinnerDropDownItemStyle">@style/itemSpinnerStyle</item>
+        <item name="android:dropDownItemStyle">@style/itemSpinnerStyle</item>
+        <item name="android:spinnerItemStyle">@style/itemSpinnerStyle</item>
+        <item name="android:spinnerStyle">@style/TestSpinner1Style</item>
+    </style>
+
+    <style name="TestSpinner1Style" parent="Widget.AppCompat.Spinner">
+        <item name="android:textColor">@color/loginTextColor</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
+    <!--    水平白线-->
+    <style name="WhiteHorizontalLine">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/lineH</item>
+        <item name="android:background">@color/lineBg</item>
+    </style>
+
+    <!--    水平灰线-->
+    <style name="GrayHorizontalLine">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/line5H</item>
+        <item name="android:background">@color/recyclerviewBg</item>
+    </style>
+
+    <!--    item title style-->
+    <style name="ItemTitleStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textColor">@color/textTitleColor</item>
+        <item name="android:textSize">@dimen/itemTitleS</item>
+    </style>
+    <!--    item desc style-->
+    <style name="ItemDesStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textSize">@dimen/itemDesS</item>
     </style>
 
 </resources>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/chapterBg"
+    android:orientation="vertical">
+
+    <!--    todo 右侧进行排序 的切换-->
+    <com.example.leisure.widget.CommonToolbar
+        android:id="@+id/ctb_header"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/tabbarH"
+        app:toolbar_left_drawable="@drawable/selector_back" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/chapterBg"
+        app:fastScrollEnabled="true"
+        app:fastScrollHorizontalThumbDrawable="@drawable/thumb_drawable"
+        app:fastScrollHorizontalTrackDrawable="@android:color/transparent"
+        app:fastScrollVerticalThumbDrawable="@drawable/thumb_drawable"
+        app:fastScrollVerticalTrackDrawable="@android:color/transparent" />
+
+
+</LinearLayout>
