@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
@@ -14,10 +15,17 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_view"
+        <com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout
+            android:id="@+id/trl_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout>
 
         <TextView
             android:id="@+id/tv_chapter"
@@ -25,6 +33,14 @@
             android:background="@android:color/transparent"
             android:padding="@dimen/imagePadding"
             tools:text="第1话吃鸡少年石弋轩" />
+
+        <com.example.leisure.widget.CommonToolbar
+            android:id="@+id/ctb_header"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/tabbarH"
+            android:layout_gravity="top"
+            android:background="@color/textTitleColor"
+            app:toolbar_left_drawable="@drawable/selector_back" />
 
         <RelativeLayout
             android:id="@+id/rl_bottom_bar"
@@ -53,7 +69,6 @@
                 android:padding="@dimen/imagePadding"
                 android:text="缓 存"
                 android:textColor="@color/colorAccent" />
-
 
         </RelativeLayout>
 

@@ -135,7 +135,7 @@ public class MusicChannelDetailsActivity extends AppCompatActivity implements Vi
 
         mAdapter.addOnRecyclerViewItemClickListener(new BaseRecyclerViewAdapter.OnRecyclerViewItemClickListener<MusicBroadcastingDetailsBean.SonglistBean>() {
             @Override
-            public void onRecyclerViewItemClick(View view, MusicBroadcastingDetailsBean.SonglistBean bean) {
+            public void onRecyclerViewItemClick(View view, int position, MusicBroadcastingDetailsBean.SonglistBean bean) {
                 //启动后台播放，播放单个视频，跳转到详情页
                 MusicDetailsActivity.startMusicDetailsActivity(MusicChannelDetailsActivity.this, bean.songid);
             }

@@ -74,12 +74,12 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Ba
     public void onClick(View v) {
         Object position = v.getTag();
         if (mOnItemClickListener != null && !TextUtils.isEmpty(position.toString())) {
-            mOnItemClickListener.onRecyclerViewItemClick(v, mLsData.get((Integer) position));
+            mOnItemClickListener.onRecyclerViewItemClick(v, (Integer) position, mLsData.get((Integer) position));
         }
     }
 
 
     public interface OnRecyclerViewItemClickListener<T> {
-        void onRecyclerViewItemClick(View view, T bean);
+        void onRecyclerViewItemClick(View view, int position, T bean);
     }
 }

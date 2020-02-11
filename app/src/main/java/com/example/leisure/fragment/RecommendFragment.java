@@ -36,7 +36,6 @@ import androidx.recyclerview.widget.RecyclerView;
  * 5.界面的调整样式
  * 6.优化 自动加载更多
  * 7.屏幕旋转不进行重新加载数据
- *
  */
 public class RecommendFragment extends Fragment {
     private TwinklingRefreshLayout mTrlView;

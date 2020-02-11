@@ -55,6 +55,7 @@ public class ImageLoader {
             imageView.setTag(null);
             GlideApp.with(context)
                     .load(imageUrl)
+                    .placeholder(R.drawable.iphone_bg)
                     .fitCenter()//图片缩放到小于等于 ImageView 的尺寸
 //                .centerCrop() //将图片按比例缩放到足矣填充 ImageView 的尺寸
                     .optionalFitCenter()

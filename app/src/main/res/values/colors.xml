@@ -36,6 +36,7 @@
     <color name="textTitleColor">#343434</color>
     <color name="textTimeColor">#8E8E8E</color>
     <color name="textHeaderColor">#8E8E8E</color>
+    <color name="textReadingColor">#E61A5F</color>
 
 
     <!--    background-->

@@ -32,14 +32,14 @@ public class WYNewsAdapter extends BaseRecyclerViewAdapter<WangYiNewsBean> imple
         String time = bean.passtime.split(" ")[0].replace("-", ".");
         holder.setTextOfTextView(R.id.tv_time, time);
 
-        holder.setItemListener(this,position);
+        holder.setItemListener(this, position);
     }
 
 
     @Override
     public void onClick(View v) {
         if (mOnItemClickListener != null) {
-            mOnItemClickListener.onRecyclerViewItemClick(v, mLsData.get((Integer) v.getTag()));
+            mOnItemClickListener.onRecyclerViewItemClick(v, (Integer) v.getTag(), mLsData.get((Integer) v.getTag()));
         }
     }
 

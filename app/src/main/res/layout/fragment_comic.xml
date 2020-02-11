@@ -5,14 +5,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-<!--    <com.example.leisure.widget.CommonToolbar-->
-<!--        android:id="@+id/ctb_header"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        app:toolbar_left_drawable="@drawable/selector_back"-->
-<!--        app:toolbar_search_enable="true"-->
-<!--        app:toolbar_search_hint="搜索漫画名"-->
-<!--        app:toolbar_text_enable="false" />-->
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"

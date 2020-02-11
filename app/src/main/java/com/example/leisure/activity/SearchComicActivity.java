@@ -151,7 +151,7 @@ public class SearchComicActivity extends BaseActivity implements MySearchTextWat
         mRvOldSearch.setAdapter(mOldSearchAdapter);
         mOldSearchAdapter.addOnRecyclerViewItemClickListener(new BaseRecyclerViewAdapter.OnRecyclerViewItemClickListener<RecentlySearch>() {
             @Override
-            public void onRecyclerViewItemClick(View view, RecentlySearch bean) {
+            public void onRecyclerViewItemClick(View view, int position, RecentlySearch bean) {
                 String text = bean.getText();
                 mEtSearch.setText(text);
                 mEtSearch.setSelection(text.length());
@@ -186,7 +186,7 @@ public class SearchComicActivity extends BaseActivity implements MySearchTextWat
         mRvResult.setAdapter(mResultAdapter);
         mResultAdapter.addOnRecyclerViewItemClickListener(new BaseRecyclerViewAdapter.OnRecyclerViewItemClickListener<ComicListBean.ListBean>() {
             @Override
-            public void onRecyclerViewItemClick(View view, ComicListBean.ListBean bean) {
+            public void onRecyclerViewItemClick(View view, int position, ComicListBean.ListBean bean) {
                 //跳转到漫画详情
                 ComicDetailsActivity.startComicDetailsActivity(SearchComicActivity.this, bean.url);
             }

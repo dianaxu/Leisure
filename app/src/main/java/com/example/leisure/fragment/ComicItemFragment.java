@@ -17,6 +17,8 @@ import com.example.leisure.glide.ImageLoader;
 import com.example.leisure.retrofit.MyComicObserver;
 import com.example.leisure.retrofit.RetrofitComicUtils;
 import com.example.leisure.retrofit.RxHelper;
+import com.lcodecore.tkrefreshlayout.RefreshListenerAdapter;
+import com.lcodecore.tkrefreshlayout.TwinklingRefreshLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +45,7 @@ public class ComicItemFragment extends Fragment implements BaseRecyclerViewAdapt
     private boolean mIsFirstLoad = true;    //第一次加载
 
     private View rootView;
+    private TwinklingRefreshLayout mTrlView;
     private RecyclerView mRvView;
     private BaseRecyclerViewAdapter mAdapter;
 
@@ -76,15 +79,32 @@ public class ComicItemFragment extends Fragment implements BaseRecyclerViewAdapt
             rootView = inflater.inflate(R.layout.fragment_comic_item, container, false);
         }
         mRvView = rootView.findViewById(R.id.rv_view);
+        mTrlView = rootView.findViewById(R.id.trl_view);
 
+        initTwinklingRefreshLayout();
         initRecyclerView();
         return rootView;
     }
 
-    private void initRecyclerView() {
+    //初始化刷新控件
+    private void initTwinklingRefreshLayout() {
+        mTrlView.setEnableRefresh(false);
+        mTrlView.setOnRefreshListener(new RefreshListenerAdapter() {
 
+            @Override
+            public void onLoadMore(TwinklingRefreshLayout refreshLayout) {
+                super.onLoadMore(refreshLayout);
+                if (Integer.parseInt(mComicItem.dpages) == Integer.parseInt(mComicItem.pages)) {
+                    Toast.makeText(getContext(), "已到达最后一页", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                getComic(Integer.parseInt(mComicItem.pages) + 1, false);
+            }
+        });
+    }
+
+    private void initRecyclerView() {
         GridLayoutManager layoutManager = new GridLayoutManager(getContext(), 3);
-//        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         mRvView.setLayoutManager(layoutManager);
 
         mAdapter = new BaseRecyclerViewAdapter<ComicListBean.ListBean>(getContext(), mLsData) {
@@ -154,13 +174,13 @@ public class ComicItemFragment extends Fragment implements BaseRecyclerViewAdapt
         if (!mIsPrepare || !mIsVisible || !mIsFirstLoad) {
             return;
         }
-        getComic();
+        getComic(Integer.parseInt(mComicItem.pages), true);
         //数据加载完毕,恢复标记,防止重复加载
         mIsFirstLoad = false;
     }
 
     @Override
-    public void onRecyclerViewItemClick(View view, ComicListBean.ListBean bean) {
+    public void onRecyclerViewItemClick(View view, int position, ComicListBean.ListBean bean) {
         //todo 跳转到漫画详情页
         ComicDetailsActivity.startComicDetailsActivity(getContext(), bean.url);
     }
@@ -168,16 +188,12 @@ public class ComicItemFragment extends Fragment implements BaseRecyclerViewAdapt
     /**
      * 获取漫画分类详情
      */
-    private void getComic() {
-        int currentPage = Integer.valueOf(mComicItem.pages);
-//        int maxPage = Integer.valueOf(mComicItem.dpages);
-//        //已经是最后一页了
-//        if (currentPage == maxPage) {
-//            return;
-//        }
+    private void getComic(int page, boolean isUpdate) {
         mObserver = new MyComicObserver<ComicListBean>(getActivity()) {
             @Override
             public void onSuccess(ComicListBean result) {
+                mTrlView.finishRefreshing();
+                mTrlView.finishLoadmore();
                 if (result == null) {
                     Toast.makeText(getActivity(), "无数据", Toast.LENGTH_LONG).show();
                     return;
@@ -189,18 +205,23 @@ public class ComicItemFragment extends Fragment implements BaseRecyclerViewAdapt
                     result.list.remove(0);
                 }
                 mLsData = result.list;
-                mAdapter.addMoreData(mLsData);
+                if (isUpdate)
+                    mAdapter.updateData(mLsData);
+                else
+                    mAdapter.addMoreData(mLsData);
             }
 
 
             @Override
             public void onFailure(Throwable e, String errorMsg) {
+                mTrlView.finishRefreshing();
+                mTrlView.finishLoadmore();
                 Toast.makeText(getActivity(), errorMsg, Toast.LENGTH_LONG).show();
             }
         };
 
         RetrofitComicUtils.getApiUrl()
-                .getComicList(mMhlb + "-" + (currentPage + 1))
+                .getComicList(mMhlb + "-" + page)
                 .compose(RxHelper.observableIO2Main(getActivity()))
                 .subscribe(mObserver);
     }

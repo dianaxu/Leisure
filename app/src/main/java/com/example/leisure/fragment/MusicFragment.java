@@ -133,7 +133,7 @@ public class MusicFragment extends Fragment implements BaseRecyclerViewAdapter.O
     }
 
     @Override
-    public void onRecyclerViewItemClick(View view, ChannellistBean bean) {
-        MusicChannelDetailsActivity.startMusicChannelDetailsActivity(getContext(),bean.ch_name,bean.thumb,bean.name);
+    public void onRecyclerViewItemClick(View view, int position, ChannellistBean bean) {
+        MusicChannelDetailsActivity.startMusicChannelDetailsActivity(getContext(), bean.ch_name, bean.thumb, bean.name);
     }
 }

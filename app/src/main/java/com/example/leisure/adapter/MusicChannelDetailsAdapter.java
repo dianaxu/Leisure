@@ -28,14 +28,14 @@ public class MusicChannelDetailsAdapter extends BaseRecyclerViewAdapter<MusicBro
         holder.setTextOfTextView(R.id.tv_title, bean.title);
         holder.setTextOfTextView(R.id.tv_artist, bean.artist);
 
-        holder.setItemListener(this,position);
+        holder.setItemListener(this, position);
     }
 
 
     @Override
     public void onClick(View v) {
         if (mOnItemClickListener != null) {
-            mOnItemClickListener.onRecyclerViewItemClick(v, mLsData.get((Integer) v.getTag()));
+            mOnItemClickListener.onRecyclerViewItemClick(v, (Integer) v.getTag(), mLsData.get((Integer) v.getTag()));
         }
     }
 

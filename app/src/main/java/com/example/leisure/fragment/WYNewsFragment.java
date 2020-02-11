@@ -147,7 +147,7 @@ public class WYNewsFragment extends Fragment implements BaseRecyclerViewAdapter.
     }
 
     @Override
-    public void onRecyclerViewItemClick(View view, WangYiNewsBean bean) {
+    public void onRecyclerViewItemClick(View view, int position, WangYiNewsBean bean) {
         WYNewsDetailsActivity.startActivity(getContext(), bean.path);
     }
 }

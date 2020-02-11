@@ -45,7 +45,9 @@ public class ComicItemBean extends BaseComicResponse implements Serializable {
 
         public String num;
         public String url;
+        public boolean visible;
+        public boolean isReading;
 
-        public List<ComicContentBean.ListBean> list=new ArrayList<>();
+        public List<ComicContentBean.ListBean> list = new ArrayList<>();
     }
 }

@@ -5,9 +5,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.leisure.R;
-import com.example.leisure.activity.ComicContentActivity;
 import com.example.leisure.adapter.BaseRecyclerViewAdapter;
 import com.example.leisure.adapter.BaseViewHolder;
 import com.example.leisure.bean.ComicItemBean;
@@ -36,28 +36,43 @@ import androidx.recyclerview.widget.RecyclerView;
 public class ChapterFragment extends Fragment implements BaseRecyclerViewAdapter.OnRecyclerViewItemClickListener<ComicItemBean.ChapterBean> {
     public static final String BUNDLE_KEY_CHAPTER = "key_chapter";
     public static final String BUNDLE_KEY_TITLE = "key_title";
+    public static final String BUNDLE_KEY_HURL1 = "key_hurl1";         //书的链接
+
     private List<ComicItemBean.ChapterBean> mLsData = new ArrayList<>();
     private String mTitle;
+    private String mUrl;
 
     private CommonToolbar mCtbHeader;
     private RecyclerView mRvView;
     private BaseRecyclerViewAdapter mAdapter;
 
     private OnToolbarListener mListener;
+    private OnChapterSelectedListener mChapterSelectedListener;
+    private int mReadingPosition = 0;
 
-    /**
-     * @param chapterBeanList 所有的章节
-     * @param title           漫画名称
-     * @return
-     */
+
     public static ChapterFragment newInstance(List<ComicItemBean.ChapterBean> chapterBeanList,
-                                              String title) {
+                                              String title, String url) {
         Bundle bundle = new Bundle();
         bundle.putSerializable(BUNDLE_KEY_CHAPTER, (Serializable) chapterBeanList);
         bundle.putString(BUNDLE_KEY_TITLE, title);
+        bundle.putString(BUNDLE_KEY_HURL1, url);
         ChapterFragment fragment = new ChapterFragment();
         fragment.setArguments(bundle);
         return fragment;
+    }
+
+    public void setReading(int position) {
+        if (mLsData != null && mLsData.size() > position) {
+            mLsData.get(mReadingPosition).isReading = false;
+            mReadingPosition = position;
+            mLsData.get(mReadingPosition).isReading = true;
+            if (mAdapter != null && mRvView != null) {
+                mAdapter.notifyDataSetChanged();
+                LinearLayoutManager manager = (LinearLayoutManager) mRvView.getLayoutManager();
+                manager.scrollToPositionWithOffset(mReadingPosition, 200);
+            }
+        }
     }
 
     @Override
@@ -79,6 +94,7 @@ public class ChapterFragment extends Fragment implements BaseRecyclerViewAdapter
         if (bundle != null) {
             mLsData = (List<ComicItemBean.ChapterBean>) bundle.getSerializable(BUNDLE_KEY_CHAPTER);
             mTitle = bundle.getString(BUNDLE_KEY_TITLE);
+            mUrl = bundle.getString(BUNDLE_KEY_HURL1);
         }
     }
 
@@ -123,11 +139,20 @@ public class ChapterFragment extends Fragment implements BaseRecyclerViewAdapter
                 return R.layout.item_chapter;
             }
 
+
             @Override
             public void onBindView(BaseViewHolder holder, int position) {
                 ComicItemBean.ChapterBean bean = mLsData.get(position);
 
-                holder.setTextOfTextView(R.id.tv_num, bean.num);
+                TextView tvNum = (TextView) holder.getView(R.id.tv_num);
+                tvNum.setText(bean.num);
+                if (bean.isReading) {
+                    holder.setColorOfTextView(R.id.tv_num, getResources().getColor(R.color.textReadingColor));
+//                    tvNum.setTextColor(getResources().getColor(R.color.textReadingColor));
+                } else
+                    holder.setColorOfTextView(R.id.tv_num, getResources().getColor(R.color.textTitleColor));
+
+//                tvNum.setTextColor(getResources().getColor(R.color.textTitleColor));
 
                 //todo 需要去判断是否已经缓存了
                 holder.getView(R.id.tv_presence).setVisibility(View.GONE);
@@ -141,12 +166,21 @@ public class ChapterFragment extends Fragment implements BaseRecyclerViewAdapter
     }
 
     @Override
-    public void onRecyclerViewItemClick(View view, ComicItemBean.ChapterBean bean) {
-        //todo  跳转到漫画内容页
-        ComicContentActivity.startComicContentActivity(getActivity(), mLsData, bean, mTitle);
+    public void onRecyclerViewItemClick(View view, int position, ComicItemBean.ChapterBean bean) {
+        if (mChapterSelectedListener != null) {
+            mChapterSelectedListener.onChapterSelected(position);
+        }
+    }
+
+    public void addChapterSelectedListener(OnChapterSelectedListener listener) {
+        this.mChapterSelectedListener = listener;
     }
 
     public interface OnToolbarListener {
         void onBackClick();
+    }
+
+    public interface OnChapterSelectedListener {
+        void onChapterSelected(int position);
     }
 }
