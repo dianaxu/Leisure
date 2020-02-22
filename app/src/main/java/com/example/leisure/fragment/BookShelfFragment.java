@@ -74,7 +74,7 @@ public class BookShelfFragment extends BaseFragment implements TextView.OnEditor
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mBookShelfDao = MainApplication.getDaoSession().getBookShelfDao();
+        mBookShelfDao = MainApplication.getInstance().getDaoSession().getBookShelfDao();
 
     }
 
@@ -137,7 +137,10 @@ public class BookShelfFragment extends BaseFragment implements TextView.OnEditor
     public void onRecyclerViewItemClick(View view, int position, BookShelf bean) {
         //跳转到漫画内容页  直接阅读
         List<ComicItemBean.ChapterBean> lsChapter = new ArrayList<>();
-        List<BookChapter> list = MainApplication.getDaoSession().getBookChapterDao().queryBuilder().where(BookChapterDao.Properties.BookId.eq(bean.get_id())).build().list();
+        List<BookChapter> list = MainApplication.getInstance().getDaoSession().getBookChapterDao().queryBuilder()
+                .where(BookChapterDao.Properties.BookId.eq(bean.get_id()))
+                .build()
+                .list();
         //阅读到的章节 包装数据
 //        ComicItemBean.ChapterBean readChapter = null;
         int posi = 0;

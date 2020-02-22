@@ -34,23 +34,26 @@ public class BookShelf {
     private boolean isTop;    //是否置顶
     private Long readToChapterId;   //记录阅读到的章节
     private String readToChapterUrl;   //记录阅读到章节url
+    //0  未下载
+    //1  已下载
+    //2  正在下载
+    //3  取消下载
+    private int cacheState;
+    private float progress;
 
     @ToMany(referencedJoinProperty = "bookId")
     private List<BookChapter> mLsChapter;
-    /**
-     * Used to resolve relations
-     */
+    /** Used to resolve relations */
     @Generated(hash = 2040040024)
     private transient DaoSession daoSession;
-    /**
-     * Used for active entity operations.
-     */
+    /** Used for active entity operations. */
     @Generated(hash = 1689124318)
     private transient BookShelfDao myDao;
 
-    @Generated(hash = 815968189)
-    public BookShelf(Long _id, String name, String url, String cover, String time, String latest,
-            long lastTime, boolean isTop, Long readToChapterId, String readToChapterUrl) {
+    @Generated(hash = 1381356201)
+    public BookShelf(Long _id, String name, String url, String cover, String time,
+            String latest, long lastTime, boolean isTop, Long readToChapterId,
+            String readToChapterUrl, int cacheState, float progress) {
         this._id = _id;
         this.name = name;
         this.url = url;
@@ -61,6 +64,8 @@ public class BookShelf {
         this.isTop = isTop;
         this.readToChapterId = readToChapterId;
         this.readToChapterUrl = readToChapterUrl;
+        this.cacheState = cacheState;
+        this.progress = progress;
     }
 
     @Generated(hash = 547688644)
@@ -131,6 +136,38 @@ public class BookShelf {
         this.isTop = isTop;
     }
 
+    public Long getReadToChapterId() {
+        return this.readToChapterId;
+    }
+
+    public void setReadToChapterId(Long readToChapterId) {
+        this.readToChapterId = readToChapterId;
+    }
+
+    public String getReadToChapterUrl() {
+        return this.readToChapterUrl;
+    }
+
+    public void setReadToChapterUrl(String readToChapterUrl) {
+        this.readToChapterUrl = readToChapterUrl;
+    }
+
+    public int getCacheState() {
+        return this.cacheState;
+    }
+
+    public void setCacheState(int cacheState) {
+        this.cacheState = cacheState;
+    }
+
+    public float getProgress() {
+        return this.progress;
+    }
+
+    public void setProgress(float progress) {
+        this.progress = progress;
+    }
+
     /**
      * To-many relationship, resolved on first access (and after reset).
      * Changes to to-many relations are not persisted, make changes to the target entity.
@@ -154,9 +191,7 @@ public class BookShelf {
         return mLsChapter;
     }
 
-    /**
-     * Resets a to-many relationship, making the next get call to query for a fresh result.
-     */
+    /** Resets a to-many relationship, making the next get call to query for a fresh result. */
     @Generated(hash = 983337844)
     public synchronized void resetMLsChapter() {
         mLsChapter = null;
@@ -198,29 +233,11 @@ public class BookShelf {
         myDao.update(this);
     }
 
-    /**
-     * called by internal mechanisms, do not call yourself.
-     */
+    /** called by internal mechanisms, do not call yourself. */
     @Generated(hash = 231179132)
     public void __setDaoSession(DaoSession daoSession) {
         this.daoSession = daoSession;
         myDao = daoSession != null ? daoSession.getBookShelfDao() : null;
-    }
-
-    public Long getReadToChapterId() {
-        return this.readToChapterId;
-    }
-
-    public void setReadToChapterId(Long readToChapterId) {
-        this.readToChapterId = readToChapterId;
-    }
-
-    public String getReadToChapterUrl() {
-        return this.readToChapterUrl;
-    }
-
-    public void setReadToChapterUrl(String readToChapterUrl) {
-        this.readToChapterUrl = readToChapterUrl;
     }
 
 }

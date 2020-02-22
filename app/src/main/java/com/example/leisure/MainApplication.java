@@ -1,21 +1,29 @@
 package com.example.leisure;
 
 import android.app.Application;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.os.IBinder;
+import android.util.Log;
 
 import com.danikula.videocache.HttpProxyCacheServer;
 import com.example.leisure.db.greendao.DaoManager;
 import com.example.leisure.greenDao.gen.DaoSession;
 import com.example.leisure.retrofit.RetrofitComicUtils;
 import com.example.leisure.retrofit.RetrofitUtils;
+import com.example.leisure.service.DownloadService;
+import com.example.leisure.service.TestService;
 import com.example.leisure.util.Constant;
 
 import java.io.File;
 import java.util.HashMap;
 
 public class MainApplication extends Application {
+    private static final String TAG = "DownloadTask";
     private static MainApplication mApp;
 
     // 声明一个公共的信息映射对象，可当作全局变量使用
@@ -26,20 +34,57 @@ public class MainApplication extends Application {
 
     public SharedPreferences mSharedPref;
 
-    private static DaoSession mDaoSession;
+    private DaoSession mDaoSession;
+    private DownloadService mDownloadService;
+    private ServiceConnection mDownloadConn = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            isCon = true;
+            DownloadService.DownloadBinder iBinder = (DownloadService.DownloadBinder) service;
+            mDownloadService = iBinder.getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            isCon = false;
+        }
+    };
 
 
     public static MainApplication getInstance() {
         return mApp;
     }
 
+    private TestService mService;
+    private boolean isCon = false;
+    private ServiceConnection mConn = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            TestService.TestBinder binder = (TestService.TestBinder) service;
+            mService = binder.getTestService();
+            isCon = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            isCon = false;
+        }
+    };
+
     @Override
     public void onCreate() {
+        Log.e(TAG, "MainApplication->onCreate: ");
         initBaseApi();
         initGreenDao();
         getBaseDataBySharedPref();
+//        Intent intent = new Intent(this, TestService.class);
+//        bindService(intent, mConn, BIND_AUTO_CREATE);
+        Intent intent = new Intent(this, DownloadService.class);
+        bindService(intent, mDownloadConn, BIND_AUTO_CREATE);
         super.onCreate();
         mApp = this;
+
+
     }
 
     private void getBaseDataBySharedPref() {
@@ -110,7 +155,25 @@ public class MainApplication extends Application {
         return new File(context.getExternalCacheDir(), "video-cache");
     }
 
-    public static DaoSession getDaoSession() {
+    public DaoSession getDaoSession() {
         return mDaoSession;
+    }
+
+    public TestService getTestService() {
+        if (isCon) {
+            return mService;
+        }
+        return null;
+    }
+
+    public DownloadService getDownloadService() {
+        if (isCon) {
+            return mDownloadService;
+        }
+        return null;
+    }
+
+    public boolean hasConnService() {
+        return isCon;
     }
 }

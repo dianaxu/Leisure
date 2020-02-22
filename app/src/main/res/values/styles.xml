@@ -128,8 +128,14 @@
         <item name="android:background">@color/lineBg</item>
     </style>
 
-    <!--    水平灰线-->
     <style name="GrayHorizontalLine">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/lineH</item>
+        <item name="android:background">@color/recyclerviewBg</item>
+    </style>
+
+    <!--    水平灰线5-->
+    <style name="GrayHorizontalLine5">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/line5H</item>
         <item name="android:background">@color/recyclerviewBg</item>

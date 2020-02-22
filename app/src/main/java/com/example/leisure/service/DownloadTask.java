@@ -20,9 +20,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 
@@ -35,17 +33,25 @@ public class DownloadTask extends AsyncTask<Object, ChapterDetail, BookChapter> 
     private DaoSession mDaoSession;
 
     private onDownLoadInterface mInterface;
+    private boolean mIsCancel = false;
+
+    public void cancelTask() {
+        mIsCancel = true;
+        this.cancel(true);
+    }
 
     public BookChapter getBookChapter() {
         return mChapter;
     }
 
     public interface onDownLoadInterface {
-        void onStarting(long chapterId, int imgCount);
+        void onStarting(long chapterId);
 
         void onProgressUpdate(BookChapter bean, ChapterDetail detail);
 
         void onFinish(BookChapter bean);
+
+        void onFail(long chapterId);
     }
 
     public DownloadTask(Context context, DaoSession daoSession, onDownLoadInterface face) {
@@ -63,41 +69,57 @@ public class DownloadTask extends AsyncTask<Object, ChapterDetail, BookChapter> 
     @Override
     protected BookChapter doInBackground(Object... details) {
         mChapter = (BookChapter) details[0];
+        long chapterId = mChapter.get_id();
+        Log.e(TAG, chapterId + "doInBackground--->mIsCancel" + mIsCancel);
+        if (mIsCancel) {
+            Log.e(TAG, chapterId + "doInBackground--->canceled");
+            return mChapter;
+        }
 
         List<ChapterDetail> lsImg = mChapter.getMLsChapterImage();
 
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Log.e(TAG, mChapter.get_id() + "  doInBackground  " + df.format(new Date()));
+        Log.e(TAG, chapterId + "  doInBackground  " + mChapter.getCacheCount() + ":" + mChapter.getMaxCount());
 
         if (lsImg.size() == 0) {
-            lsImg = getComicContent();
+            if (mChapter.getMaxCount() > 0)
+                lsImg = mDaoSession.getChapterDetailDao().queryRaw("where Chapter_Id = ?", new String[]{String.valueOf(chapterId)});
+            else
+                lsImg = getComicContent();
         }
         //没有图片集
         if (lsImg == null) {
+            mInterface.onFail(chapterId);
             return mChapter;
         }
 
         //循环图片集
         int length = lsImg.size();
+        mChapter.setMaxCount(length);
+        mChapter.setCacheCount(0);
         for (int i = 0; i < length; i++) {
+            Log.e(TAG, chapterId + "-------doInBackground-------->" + mIsCancel);
             //任务中途被取消
-            if (isCancelled()) {
+            if (mIsCancel) {
+                Log.e(TAG, chapterId + "doInBackground--->canceled" + i);
                 return mChapter;
             }
             ChapterDetail bean = lsImg.get(i);
             //图片存在，但是数据库
+            // 没有缓存
+            if (bean.getIsCaching()) {
+                mChapter.setCacheCount(mChapter.getCacheCount() + 1);
+                continue;
+            }
 
-            //已经缓存
-            if (!bean.getIsCaching()) {
-                //下载图片
-                String filePath = downloadImage(bean.getImg());
-                if (filePath != null) {
-                    //todo 需要保存path 及 iscaching
-                    bean.setPath(filePath);
-                    bean.setIsCaching(true);
-                    //更新进度
-                    publishProgress(bean);
-                }
+            //下载图片
+            String filePath = downloadImage(bean.getImg());
+            if (filePath != null) {
+                //todo 需要保存path 及 iscaching
+                bean.setPath(filePath);
+                bean.setIsCaching(true);
+                mChapter.setCacheCount(mChapter.getCacheCount() + 1);
+                //更新进度
+                publishProgress(bean);
             }
         }
 
@@ -108,6 +130,7 @@ public class DownloadTask extends AsyncTask<Object, ChapterDetail, BookChapter> 
     @Override
     protected void onProgressUpdate(ChapterDetail... values) {
         super.onProgressUpdate(values);
+        Log.e(TAG, "----------------onProgressUpdate: ");
         mInterface.onProgressUpdate(mChapter, values[0]);
     }
 
@@ -118,7 +141,12 @@ public class DownloadTask extends AsyncTask<Object, ChapterDetail, BookChapter> 
     }
 
     private String downloadImage(String imgUrl) {
-        String savePath = FileUtil.getSavePath(mContext, mChapter.getBookId(), mChapter.get_id(), analysisImageUrl(imgUrl));
+        //解析图片名称出问题
+        String imageName = analysisImageUrl(imgUrl);
+        if (imageName == null) return imageName;
+
+        //图片名称解析完  存放的位置
+        String savePath = FileUtil.getSavePath(mContext, mChapter.getBookId(), mChapter.get_id(), imageName);
         if (FileUtil.hasFile(savePath)) {
             return savePath;
         }
@@ -175,6 +203,8 @@ public class DownloadTask extends AsyncTask<Object, ChapterDetail, BookChapter> 
 
                     return lsDetail;
                 }
+            } else {
+                mInterface.onFail(mChapter.get_id());
             }
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -212,9 +242,11 @@ public class DownloadTask extends AsyncTask<Object, ChapterDetail, BookChapter> 
                 imageFileName = split[i];
             }
         }
-        return imageFileName.replace("_", "")
-                .replace(".jpg", "")
-                .replace(".png", "");
+        if (imageFileName == null) return imageFileName;
+        else
+            return imageFileName.replace("_", "")
+                    .replace(".jpg", "")
+                    .replace(".png", "");
     }
 
 }

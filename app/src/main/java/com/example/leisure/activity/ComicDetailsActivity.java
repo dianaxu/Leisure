@@ -98,9 +98,9 @@ public class ComicDetailsActivity extends BaseActivity implements View.OnClickLi
         mBtnAddOrRemove.setOnClickListener(this);
 
         mhurl1 = getIntent().getStringExtra(BUNDLE_KEY_URL);
-        mBookShelfDao = MainApplication.getDaoSession().getBookShelfDao();
-        mBookChapterDao = MainApplication.getDaoSession().getBookChapterDao();
-        mChapterDetailDao = MainApplication.getDaoSession().getChapterDetailDao();
+        mBookShelfDao = MainApplication.getInstance().getDaoSession().getBookShelfDao();
+        mBookChapterDao = MainApplication.getInstance().getDaoSession().getBookChapterDao();
+        mChapterDetailDao = MainApplication.getInstance().getDaoSession().getChapterDetailDao();
 
         //查询书是否已经加入到书架中
         mIsAddBookShelf = bookStateByLocal();
@@ -208,7 +208,7 @@ public class ComicDetailsActivity extends BaseActivity implements View.OnClickLi
         List<BookChapter> lsBookChapter = new ArrayList<>();
         for (int i = 0; i < mData.list.size() - 1; i++) {
             ComicItemBean.ChapterBean bean = mData.list.get(i);
-            BookChapter cEntity = new BookChapter(null, bookId, bean.num, bean.url, false,0,0,0);
+            BookChapter cEntity = new BookChapter(null, bookId, bean.num, bean.url, false, 0, 0, 0);
             lsBookChapter.add(cEntity);
         }
 

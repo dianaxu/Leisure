@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.leisure.R;
+import com.example.leisure.activity.DownloadComicActivity;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,7 +20,7 @@ import androidx.fragment.app.Fragment;
 public class LeftMenuFragment extends Fragment implements View.OnClickListener {
 
     private AppCompatImageView mIvClose, mIvHead;
-    private TextView mTvName;
+    private TextView mTvName, mTvCacheManage;
 
     private OnCloseMenuListener mListener;
 
@@ -47,9 +48,11 @@ public class LeftMenuFragment extends Fragment implements View.OnClickListener {
         mTvName = view.findViewById(R.id.tv_name);
         mIvHead = view.findViewById(R.id.iv_head);
         mIvClose = view.findViewById(R.id.iv_close_menu);
+        mTvCacheManage = view.findViewById(R.id.tv_cache_manage);
 
         mIvHead.setOnClickListener(this);
         mIvClose.setOnClickListener(this); //关闭侧滑栏按钮
+        mTvCacheManage.setOnClickListener(this);
     }
 
 
@@ -63,6 +66,8 @@ public class LeftMenuFragment extends Fragment implements View.OnClickListener {
         } else if (R.id.iv_head == id) {
 
             //todo 跳转到个人中心
+        } else if (R.id.tv_cache_manage == id) {
+            DownloadComicActivity.startDownloadComicActivity(getContext());
         }
     }
 

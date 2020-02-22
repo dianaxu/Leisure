@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/tv_chapter_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/margin"
+        android:layout_marginTop="@dimen/margin"
+
+        custom:layout_constraintLeft_toLeftOf="parent"
+        custom:layout_constraintRight_toLeftOf="@id/tv_count"
+        custom:layout_constraintTop_toTopOf="parent"
+        tools:text="第一话：收到回复咖啡" />
+
+    <TextView
+        android:id="@+id/tv_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="@dimen/imagePadding"
+        android:textSize="10sp"
+        custom:layout_constraintBaseline_toBaselineOf="@id/tv_chapter_name"
+        custom:layout_constraintLeft_toRightOf="@id/tv_chapter_name"
+        custom:layout_constraintRight_toLeftOf="@id/iv_play"
+        tools:text="等待下载" />
+
+    <com.daimajia.numberprogressbar.NumberProgressBar
+        android:id="@+id/pb_update_progress"
+        style="@style/NumberProgressBar_Default"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/margin"
+        android:layout_marginTop="@dimen/imagePadding"
+        android:layout_toLeftOf="@id/iv_play"
+        custom:layout_constraintLeft_toLeftOf="parent"
+        custom:layout_constraintRight_toLeftOf="@id/iv_play"
+        custom:layout_constraintTop_toBottomOf="@id/tv_chapter_name"
+        custom:progress_current="0"
+        custom:progress_max="100"
+        custom:progress_reached_bar_height="3dp"
+        custom:progress_reached_color="#3498DB"
+        custom:progress_text_color="#3498DB"
+        custom:progress_text_offset="1dp"
+        custom:progress_text_size="10sp"
+        custom:progress_text_visibility="visible"
+        custom:progress_unreached_bar_height="1.5dp"
+        custom:progress_unreached_color="#CCCCCC" />
+
+
+    <ImageView
+        android:id="@+id/iv_play"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+
+        android:padding="@dimen/imagePadding"
+        android:src="@drawable/selector_download_play_or_pause"
+        custom:layout_constraintBottom_toBottomOf="parent"
+        custom:layout_constraintRight_toRightOf="parent"
+        custom:layout_constraintTop_toTopOf="parent" />
+
+
+    <View
+        android:id="@+id/v_line"
+        style="@style/GrayHorizontalLine"
+        android:layout_marginTop="@dimen/margin"
+        custom:layout_constraintBottom_toBottomOf="parent"
+        custom:layout_constraintLeft_toLeftOf="parent"
+        custom:layout_constraintTop_toBottomOf="@id/pb_update_progress" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

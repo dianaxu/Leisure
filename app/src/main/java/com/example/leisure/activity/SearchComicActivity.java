@@ -19,6 +19,7 @@ import com.example.leisure.adapter.BaseViewHolder;
 import com.example.leisure.bean.ComicListBean;
 import com.example.leisure.db.greendao.RecentlySearch;
 import com.example.leisure.glide.ImageLoader;
+import com.example.leisure.greenDao.gen.DaoSession;
 import com.example.leisure.greenDao.gen.RecentlySearchDao;
 import com.example.leisure.retrofit.MyComicObserver;
 import com.example.leisure.retrofit.RetrofitComicUtils;
@@ -51,7 +52,7 @@ public class SearchComicActivity extends BaseActivity implements MySearchTextWat
     private BaseRecyclerViewAdapter mResultAdapter;
     private BaseRecyclerViewAdapter mOldSearchAdapter;
 
-
+    private DaoSession mDaoSession;
     private MyComicObserver mObserver;
     private List<ComicListBean.ListBean> mLsResultData = new ArrayList<>();
     private List<RecentlySearch> mLsSearchData = new ArrayList<>();
@@ -66,6 +67,7 @@ public class SearchComicActivity extends BaseActivity implements MySearchTextWat
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_comic);
+        mDaoSession = MainApplication.getInstance().getDaoSession();
 
         mCtbHeader = findViewById(R.id.ctb_header);
         mRvOldSearch = findViewById(R.id.rv_old_search);
@@ -114,7 +116,7 @@ public class SearchComicActivity extends BaseActivity implements MySearchTextWat
                     entity.setDataTime(df.format(new Date()));
                     entity.setText(value);
                     entity.setUserName(MainApplication.getInstance().getInfo(Constant.SharedPref.BASE_DATA_USER_NAME));
-                    MainApplication.getDaoSession().getRecentlySearchDao().insertOrReplace(entity);
+                    mDaoSession.getRecentlySearchDao().insertOrReplace(entity);
                     return true;
                 }
                 return false;
@@ -124,7 +126,7 @@ public class SearchComicActivity extends BaseActivity implements MySearchTextWat
 
     //初始化最近搜索的词
     private void initRvOldSearch() {
-        mLsSearchData = MainApplication.getDaoSession().getRecentlySearchDao().queryBuilder()
+        mLsSearchData =mDaoSession.getRecentlySearchDao().queryBuilder()
                 .orderDesc(RecentlySearchDao.Properties.DataTime)
                 .limit(10)
                 .list();

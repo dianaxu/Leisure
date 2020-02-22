@@ -46,5 +46,24 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <View
+        android:id="@+id/v_line"
+        style="@style/GrayHorizontalLine"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/cl_head_view" />
+
+    <TextView
+        android:id="@+id/tv_cache_manage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:drawableLeft="@drawable/ic_add"
+        android:drawableRight="@drawable/ic_arrow"
+        android:gravity="center_vertical"
+        android:padding="@dimen/margin"
+        android:text="     缓存管理"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/v_line" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

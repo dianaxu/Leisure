@@ -106,7 +106,7 @@ public class ComicContentActivity extends BaseActivity implements View.OnClickLi
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comic_content);
-        mDaoSession = MainApplication.getDaoSession();
+        mDaoSession = MainApplication.getInstance().getDaoSession();
 
         initViewDate();               //初始化界面数据
         initView();                   //初始化控件

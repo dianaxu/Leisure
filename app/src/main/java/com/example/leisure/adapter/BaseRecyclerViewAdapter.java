@@ -1,7 +1,6 @@
 package com.example.leisure.adapter;
 
 import android.content.Context;
-import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -31,7 +30,6 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Ba
 
     @Override
     public void onBindViewHolder(@NonNull BaseViewHolder holder, int position) {
-
         holder.setItemListener(this, position);
         onBindView(holder, position);
     }
@@ -66,14 +64,19 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Ba
         notifyDataSetChanged();
     }
 
+    public void ItemChanged(T bean, int pos) {
+        mLsData.set(pos, bean);
+        notifyItemChanged(pos);
+    }
+
     public void addOnRecyclerViewItemClickListener(OnRecyclerViewItemClickListener<T> listener) {
         this.mOnItemClickListener = listener;
     }
 
     @Override
     public void onClick(View v) {
-        Object position = v.getTag();
-        if (mOnItemClickListener != null && !TextUtils.isEmpty(position.toString())) {
+        int position = (int) v.getTag();
+        if (mOnItemClickListener != null) {
             mOnItemClickListener.onRecyclerViewItemClick(v, (Integer) position, mLsData.get((Integer) position));
         }
     }

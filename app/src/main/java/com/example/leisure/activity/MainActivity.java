@@ -1,7 +1,9 @@
 package com.example.leisure.activity;
 
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
@@ -17,6 +19,7 @@ import com.example.leisure.util.ScreenInfoUtils;
 import com.example.leisure.widget.GradualTabView;
 import com.nineoldandroids.view.ViewHelper;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -83,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         setCurrrentTab(0);
     }
+
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {

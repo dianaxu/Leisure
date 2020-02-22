@@ -132,10 +132,26 @@ public class Test2Activity extends FragmentActivity implements View.OnClickListe
     }
 
     @Override
-    public void updateUI(int receiverState, int totalCount, int maxCount, long chapterId) {
-        CharSequence text = mTvDownload.getText();
-        mTvDownload.setText("receiverState=>" + text + "\n" + totalCount + ":" + maxCount + "--" + chapterId);
+    public void updateUI(DownloadReceiver.ReceiverBean bean) {
+//        CharSequence text = mTvDownload.getText();
+//        mTvDownload.setText("receiverState=>" + text + "\n" + totalCount + ":" + maxCount + "--" + chapterId);
     }
+
+    @Override
+    public void promptStart(DownloadReceiver.ReceiverPromptBean bean) {
+
+    }
+
+    @Override
+    public void promptFail(DownloadReceiver.ReceiverPromptBean bean) {
+
+    }
+
+    @Override
+    public void finishDown(DownloadReceiver.ReceiverBean bean) {
+
+    }
+
 
     //-------------------------------------------------压缩图片
 

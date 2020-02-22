@@ -34,8 +34,14 @@ public class Constant {
     }
 
     public class DownloadReceiverState {
-        public static final int UPDATE = 0;  //更新数据
-        public static final int FINISH = 1;  //完成全部下载
-        public static final int NO_FINISH_ALL = 2; //任务完成，但未全部下载
+        public static final int PROMPT_START = 0;  //提示信息
+        public static final int PROMPT_FAIL = 1;  //失败
+        public static final int UPDATE = 2;  //更新
+        public static final int FINISH = 3;   //完成
+        public static final int CANCEL = 4;   //取消
+    }
+
+    public class ReceiverAction {
+        public static final String ACTION_DOWNLOAD = "com.example.leisure.DownloadReceiver";
     }
 }
