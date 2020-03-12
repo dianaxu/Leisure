@@ -22,7 +22,6 @@ import com.example.leisure.widget.CommonToolbar;
 
 /**
  * 注册界面-开发者  用户
- *
  */
 public class LogonDevelopActivity extends BaseActivity {
     public static final String EXTRA_APKID = "extra_apkid";
@@ -34,6 +33,16 @@ public class LogonDevelopActivity extends BaseActivity {
 
     private DeveloperBean mDeveloperBean = new DeveloperBean();
     private SharedPreferences mShared;
+
+    @Override
+    protected TransitionMode getOverridePendingTransitionMode() {
+        return TransitionMode.RIGHT;
+    }
+
+    @Override
+    protected boolean isHasStatusBar() {
+        return true;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

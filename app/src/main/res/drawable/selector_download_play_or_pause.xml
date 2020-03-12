@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--    todo 后期可以在21版本之上做矢量动画-->
     <item android:drawable="@drawable/pause" android:state_selected="true" />
     <item android:drawable="@drawable/play" />
 

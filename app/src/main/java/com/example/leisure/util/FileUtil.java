@@ -2,7 +2,6 @@ package com.example.leisure.util;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.os.Environment;
 import android.util.Log;
 
 import java.io.BufferedOutputStream;
@@ -13,8 +12,6 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 
 import androidx.annotation.Nullable;
-
-import static com.example.leisure.util.Constant.BASE_FILE_NAME;
 
 public class FileUtil {
     public static final int SIZETYPE_B = 1;//获取文件大小单位为B的double值
@@ -149,7 +146,7 @@ public class FileUtil {
      * @param imageName 文件名称(不带后缀)
      */
     public static String saveBitmapToFile(Context context, Bitmap bitmap, long bookId, long chapterId, String imageName) throws IOException {
-        String fileName = BASE_FILE_NAME + File.separator + bookId + File.separator + chapterId;
+        String fileName = File.separator + bookId + File.separator + chapterId;
         File folder = createFile(context, fileName);
         String savePath = folder.getPath() + File.separator + imageName + ".jpg";
 
@@ -173,8 +170,7 @@ public class FileUtil {
         // 如SD卡已存在，则存储；反之存在data目录下
         if (SdcardUtil.hasSdcard()) {
             // SD卡路径
-            filePath = Environment.getExternalStorageDirectory()
-                    + File.separator + comicFileName;
+            filePath = context.getExternalFilesDir("") + File.separator + comicFileName;
         } else {
             filePath = context.getCacheDir().getPath() + File.separator
                     + comicFileName;
@@ -191,11 +187,11 @@ public class FileUtil {
         StringBuffer filePath = new StringBuffer();
         if (SdcardUtil.hasSdcard()) {
             // SD卡路径
-            filePath.append(Environment.getExternalStorageDirectory());
+            filePath.append(context.getExternalFilesDir(""));
         } else {
             filePath.append(context.getCacheDir().getPath());
         }
-        filePath.append(File.separator + BASE_FILE_NAME);
+
         if (bookId != null) {
             filePath.append(File.separator + bookId);
         }
@@ -212,4 +208,19 @@ public class FileUtil {
     public static boolean hasFile(String filePath) {
         return new File(filePath).exists();
     }
+
+    public static void deleteDirWihtFile(File dir, boolean isDel) {
+        if (dir == null || !dir.exists() || !dir.isDirectory())
+            return;
+        for (File file : dir.listFiles()) {
+            if (file.isFile()) {
+                if (isDel)
+                    file.delete(); // 删除所有文件
+            } else if (file.isDirectory())
+                deleteDirWihtFile(file, true); // 递规的方式删除文件夹
+        }
+        if (isDel)
+            dir.delete();// 删除目录本身
+    }
+
 }

@@ -3,24 +3,28 @@
     <!--    <item android:drawable="@drawable/thumb_pressed" android:state_pressed="true" />-->
 
     <!--    <item android:drawable="@drawable/thumb" />-->
-    <item android:state_pressed="true">
-        <shape android:shape="rectangle">
+    <!--    <item android:state_pressed="true">-->
+    <!--        <shape android:shape="rectangle">-->
 
-            <size android:width="24dp" android:height="60dp"></size>
-            <corners android:bottomLeftRadius="4dp" android:bottomRightRadius="4dp" android:topLeftRadius="4dp" android:topRightRadius="4dp" />
-            <solid android:color="@color/colorPrimaryDark" />
+    <!--            <size android:width="24dp" android:height="60dp"></size>-->
+    <!--            <corners android:bottomLeftRadius="4dp" android:bottomRightRadius="4dp" android:topLeftRadius="4dp" android:topRightRadius="4dp" />-->
+    <!--            <solid android:color="@color/colorPrimaryDark" />-->
 
-        </shape>
-    </item>
+    <!--        </shape>-->
+    <!--    </item>-->
 
-    <item>
-        <shape android:shape="rectangle">
+    <!--    <item>-->
+    <!--        <shape android:shape="rectangle">-->
 
-            <size android:width="24dp" android:height="60dp"></size>
-            <corners android:bottomLeftRadius="4dp" android:bottomRightRadius="4dp" android:topLeftRadius="4dp" android:topRightRadius="4dp" />
-            <solid android:color="@color/colorPrimary" />
+    <!--            <size android:width="24dp" android:height="60dp"></size>-->
+    <!--            <corners android:bottomLeftRadius="4dp" android:bottomRightRadius="4dp" android:topLeftRadius="4dp" android:topRightRadius="4dp" />-->
+    <!--            <solid android:color="@color/colorPrimary" />-->
 
-        </shape>
-    </item>
+    <!--        </shape>-->
+    <!--    </item>-->
 
+
+    <item android:drawable="@drawable/ic_slide_block" />
+    <item android:drawable="@drawable/ic_slide_block_click" android:state_pressed="true" />
+    <item android:drawable="@drawable/ic_slide_block_click" android:state_selected="true" />
 </selector>

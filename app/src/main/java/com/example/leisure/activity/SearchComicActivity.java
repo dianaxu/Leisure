@@ -14,9 +14,10 @@ import android.widget.Toast;
 
 import com.example.leisure.MainApplication;
 import com.example.leisure.R;
-import com.example.leisure.adapter.BaseRecyclerViewAdapter;
-import com.example.leisure.adapter.BaseViewHolder;
+import com.example.leisure.activity.adapter.BaseRecyclerViewAdapter;
+import com.example.leisure.activity.adapter.BaseViewHolder;
 import com.example.leisure.bean.ComicListBean;
+import com.example.leisure.db.greendao.ComicBookBean;
 import com.example.leisure.db.greendao.RecentlySearch;
 import com.example.leisure.glide.ImageLoader;
 import com.example.leisure.greenDao.gen.DaoSession;
@@ -54,13 +55,23 @@ public class SearchComicActivity extends BaseActivity implements MySearchTextWat
 
     private DaoSession mDaoSession;
     private MyComicObserver mObserver;
-    private List<ComicListBean.ListBean> mLsResultData = new ArrayList<>();
+    private List<ComicBookBean> mLsResultData = new ArrayList<>();
     private List<RecentlySearch> mLsSearchData = new ArrayList<>();
 //    private ComicListBean.ListBean mComicItem;
 
     public static void startSearchComicActivity(Context context) {
         Intent intent = new Intent(context, SearchComicActivity.class);
         context.startActivity(intent);
+    }
+
+    @Override
+    protected TransitionMode getOverridePendingTransitionMode() {
+        return TransitionMode.RIGHT;
+    }
+
+    @Override
+    protected boolean isHasStatusBar() {
+        return true;
     }
 
     @Override
@@ -126,7 +137,7 @@ public class SearchComicActivity extends BaseActivity implements MySearchTextWat
 
     //初始化最近搜索的词
     private void initRvOldSearch() {
-        mLsSearchData =mDaoSession.getRecentlySearchDao().queryBuilder()
+        mLsSearchData = mDaoSession.getRecentlySearchDao().queryBuilder()
                 .orderDesc(RecentlySearchDao.Properties.DataTime)
                 .limit(10)
                 .list();
@@ -147,13 +158,13 @@ public class SearchComicActivity extends BaseActivity implements MySearchTextWat
 
             @Override
             public void onBindView(BaseViewHolder holder, int position) {
-                holder.setTextOfTextView(R.id.tv_text, mLsSearchData.get(position).getText());
+                holder.setText(R.id.tv_text, mLsSearchData.get(position).getText());
             }
         };
         mRvOldSearch.setAdapter(mOldSearchAdapter);
-        mOldSearchAdapter.addOnRecyclerViewItemClickListener(new BaseRecyclerViewAdapter.OnRecyclerViewItemClickListener<RecentlySearch>() {
+        mOldSearchAdapter.setOnItemClickListener(new BaseRecyclerViewAdapter.OnItemClickListener<RecentlySearch>() {
             @Override
-            public void onRecyclerViewItemClick(View view, int position, RecentlySearch bean) {
+            public void onItemClick(View view, int position, RecentlySearch bean) {
                 String text = bean.getText();
                 mEtSearch.setText(text);
                 mEtSearch.setSelection(text.length());
@@ -167,7 +178,7 @@ public class SearchComicActivity extends BaseActivity implements MySearchTextWat
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         mRvResult.setLayoutManager(layoutManager);
 
-        mResultAdapter = new BaseRecyclerViewAdapter<ComicListBean.ListBean>(this, mLsResultData) {
+        mResultAdapter = new BaseRecyclerViewAdapter<ComicBookBean>(this, mLsResultData) {
             @Override
             public int getResourseId() {
                 return R.layout.item_book_shelf;
@@ -175,22 +186,25 @@ public class SearchComicActivity extends BaseActivity implements MySearchTextWat
 
             @Override
             public void onBindView(BaseViewHolder holder, int position) {
-                ComicListBean.ListBean bean = mLsData.get(position);
+                ComicBookBean bean = mLsData.get(position);
 
-                holder.setTextOfTextView(R.id.tv_name, bean.name);
-                holder.setTextOfTextView(R.id.tv_latest, bean.latest);
-                holder.setTextOfTextView(R.id.tv_time, bean.time);
+                holder.setText(R.id.tv_name, bean.name);
+                holder.setText(R.id.tv_latest, bean.latest);
+                holder.setText(R.id.tv_time, bean.time);
 
                 ImageLoader.with(SearchComicActivity.this, bean.cover, (ImageView) holder.getView(R.id.iv_cover));
             }
         };
 
         mRvResult.setAdapter(mResultAdapter);
-        mResultAdapter.addOnRecyclerViewItemClickListener(new BaseRecyclerViewAdapter.OnRecyclerViewItemClickListener<ComicListBean.ListBean>() {
+        mResultAdapter.setOnItemClickListener(new BaseRecyclerViewAdapter.OnItemClickListener<ComicBookBean>() {
             @Override
-            public void onRecyclerViewItemClick(View view, int position, ComicListBean.ListBean bean) {
+            public void onItemClick(View view, int position, ComicBookBean bean) {
                 //跳转到漫画详情
-                ComicDetailsActivity.startComicDetailsActivity(SearchComicActivity.this, bean.url);
+                MainApplication.getInstance().saveInfo(Constant.ComicBaseBundle.BUNDLE_COVER, bean.getCover());
+                MainApplication.getInstance().saveInfo(Constant.ComicBaseBundle.BUNDLE_NAME, bean.getName());
+                MainApplication.getInstance().saveInfo(Constant.ComicBaseBundle.BUNDLE_HURL1, bean.getUrl());
+                ComicDetailsActivity.startComicDetailsActivity(SearchComicActivity.this);
             }
         });
 

@@ -11,12 +11,12 @@ import android.widget.RelativeLayout;
 
 import com.example.leisure.MainApplication;
 import com.example.leisure.R;
-import com.example.leisure.adapter.BaseViewHolder;
-import com.example.leisure.adapter.DownloadChapterAdapter;
-import com.example.leisure.db.greendao.BookChapter;
-import com.example.leisure.db.greendao.BookShelf;
+import com.example.leisure.activity.adapter.BaseViewHolder;
+import com.example.leisure.activity.adapter.DownloadChapterAdapter;
+import com.example.leisure.db.greendao.ComicChapterBean;
+import com.example.leisure.db.greendao.ComicBookBean;
 import com.example.leisure.eventbus.Event;
-import com.example.leisure.greenDao.gen.BookChapterDao;
+import com.example.leisure.greenDao.gen.ComicChapterBeanDao;
 import com.example.leisure.greenDao.gen.DaoSession;
 import com.example.leisure.receiver.DownloadReceiver;
 import com.example.leisure.service.DownloadService;
@@ -47,7 +47,7 @@ public class DownloadChapterActivity extends BaseActivity implements View.OnClic
     private String mBookName;
     private boolean mIsNewDate;
 
-    private List<BookChapter> mLsData;
+    private List<ComicChapterBean> mLsData;
 
     private CommonToolbar mCtbHeader;
     private RelativeLayout mRlAddMore;
@@ -57,10 +57,10 @@ public class DownloadChapterActivity extends BaseActivity implements View.OnClic
 
 
     private DaoSession mDaoSession;
-    private BookShelf mBook;
+    private ComicBookBean mBook;
     private DownloadReceiver mReceiver;
     private DownloadService mService;
-//    private boolean mIsConn;
+    //    private boolean mIsConn;
 //    private ServiceConnection mServiceConn;
     private String TAG = "DownloadTask";
 
@@ -95,6 +95,16 @@ public class DownloadChapterActivity extends BaseActivity implements View.OnClic
                 mIsNewDate = true;
                 break;
         }
+    }
+
+    @Override
+    protected TransitionMode getOverridePendingTransitionMode() {
+        return TransitionMode.LEFT;
+    }
+
+    @Override
+    protected boolean isHasStatusBar() {
+        return true;
     }
 
     @Override
@@ -143,11 +153,11 @@ public class DownloadChapterActivity extends BaseActivity implements View.OnClic
                 unregisterReceiver(mReceiver);
             //先执行任务，后重新获取数据
             if (mService != null)
-                mService.addMoreTask();
+                mService.addMoreTask(mBookId);
             else {
                 DownloadService downloadService = MainApplication.getInstance().getDownloadService();
                 if (downloadService != null)
-                    downloadService.addMoreTask();
+                    downloadService.addMoreTask(mBookId);
             }
             //重新获取数据
             getData();
@@ -169,7 +179,6 @@ public class DownloadChapterActivity extends BaseActivity implements View.OnClic
         super.onDestroy();
         //解除服务绑定
         unregisterReceiver(mReceiver);
-//        unbindService(mServiceConn);
     }
 
     //获取数据
@@ -181,9 +190,9 @@ public class DownloadChapterActivity extends BaseActivity implements View.OnClic
 
     //获取数据
     private void getData() {
-        mLsData = mDaoSession.getBookChapterDao().queryBuilder()
-                .where(BookChapterDao.Properties.BookId.eq(mBookId),
-                        BookChapterDao.Properties.CacheState.in(Constant.DownloadState.DOWNLOAD_CANCEL, Constant.DownloadState.DOWNLOADING))
+        mLsData = mDaoSession.getComicChapterBeanDao().queryBuilder()
+                .where(ComicChapterBeanDao.Properties.BookId.eq(mBookId),
+                        ComicChapterBeanDao.Properties.CacheState.in(Constant.DownloadState.DOWNLOAD_CANCEL, Constant.DownloadState.DOWNLOADING))
                 .list();
 
 
@@ -191,28 +200,10 @@ public class DownloadChapterActivity extends BaseActivity implements View.OnClic
 
     //还有章节需要下载
     private boolean hasMoreChapter() {
-        int notCount = mDaoSession.getBookChapterDao().queryRaw("where Cache_State = ?", String.valueOf(Constant.DownloadState.DOWNLOAD_NOT)).size();
+        int notCount = mDaoSession.getComicChapterBeanDao().queryRaw("where Cache_State = ?", String.valueOf(Constant.DownloadState.DOWNLOAD_NOT)).size();
         return notCount > 0;
     }
 
-    //绑定服务
-    private void bindService() {
-//        mServiceConn = new ServiceConnection() {
-//            @Override
-//            public void onServiceConnected(ComponentName name, IBinder service) {
-//                DownloadService.DownloadBinder mBinder = (DownloadService.DownloadBinder) service;
-//                mService = mBinder.getService();
-//                mIsConn = true;
-//            }
-//
-//            @Override
-//            public void onServiceDisconnected(ComponentName name) {
-//                mIsConn = false;
-//            }
-//        };
-//        Intent intent = new Intent(this, DownloadService.class);
-//        bindService(intent, mServiceConn, BIND_AUTO_CREATE);
-    }
 
     //初始化RecyclerView
     private void initRecyclerView() {
@@ -282,31 +273,31 @@ public class DownloadChapterActivity extends BaseActivity implements View.OnClic
 
     //开启单个任务
     @Override
-    public void startTask(BookChapter chapter) {
-        mDaoSession.getBookChapterDao().update(chapter);
+    public void startTask(ComicChapterBean chapter) {
+        mDaoSession.getComicChapterBeanDao().update(chapter);
         mService.addTask(chapter.get_id(), chapter.getBookId());
     }
 
     //停止单个任务
     @Override
-    public void stopTask(BookChapter chapter) {
+    public void stopTask(ComicChapterBean chapter) {
         Log.e(TAG, "stopTask: " + chapter.get_id());
-        mDaoSession.getBookChapterDao().update(chapter);
+        mDaoSession.getComicChapterBeanDao().update(chapter);
         mService.cancelTask(chapter, mAdapter.hasPlayTask());
     }
 
     //开启多个任务
     @Override
-    public void startTask(List<BookChapter> list) {
-        mDaoSession.getBookChapterDao().updateInTx(list);
-        mService.addMoreTask();
+    public void startTask(List<ComicChapterBean> list) {
+        mDaoSession.getComicChapterBeanDao().updateInTx(list);
+        mService.addMoreTask(mBookId);
     }
 
     //停止多个任务
     @Override
-    public void stopTask(List<BookChapter> list) {
+    public void stopTask(List<ComicChapterBean> list) {
         Log.e(TAG, "stopAllTask: " + list.size());
-        mDaoSession.getBookChapterDao().updateInTx(list);
+        mDaoSession.getComicChapterBeanDao().updateInTx(list);
         mService.cancelTask(list);
     }
 

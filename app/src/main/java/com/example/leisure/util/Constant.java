@@ -7,7 +7,7 @@ public class Constant {
     //设置默认超时时间
     public static final int DEFAULT_TIME = 10;
 
-    public static final String BASE_FILE_NAME = "leisure";
+//    public static final String BASE_FILE_NAME = "images";
 
 
     public class SharedPref {
@@ -26,6 +26,13 @@ public class Constant {
 
     }
 
+
+    public class ComicBaseBundle {
+        public static final String BUNDLE_HURL1 = "bundle_hurl1";
+        public static final String BUNDLE_NAME = "bundle_name";
+        public static final String BUNDLE_COVER = "bundle_conver";
+    }
+
     public class DownloadState {
         public static final int DOWNLOAD_NOT = 0;   //未下载
         public static final int DOWNLOADED = 1;     //已下载
@@ -39,6 +46,11 @@ public class Constant {
         public static final int UPDATE = 2;  //更新
         public static final int FINISH = 3;   //完成
         public static final int CANCEL = 4;   //取消
+    }
+
+    public class SortType {
+        public static final int DOWN = 0;
+        public static final int UP = 1;
     }
 
     public class ReceiverAction {

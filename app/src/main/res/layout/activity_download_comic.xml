@@ -7,6 +7,11 @@
     android:orientation="vertical"
     tools:context=".activity.DownloadComicActivity">
 
+    <!--模拟状态栏占位-->
+    <View
+        android:id="@+id/view_status_bar"
+        style="@style/MyStatusBar" />
+
     <com.example.leisure.widget.CommonToolbar
         android:id="@+id/ctb_header"
         android:layout_width="match_parent"
@@ -21,7 +26,6 @@
         android:id="@+id/rv_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="@dimen/margin"
         android:scrollbars="vertical" />
 
 </LinearLayout>

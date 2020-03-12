@@ -5,11 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.example.leisure.R;
-import com.example.leisure.bean.ComicItemBean;
-import com.example.leisure.fragment.ChapterFragment;
-
-import java.io.Serializable;
-import java.util.List;
+import com.example.leisure.activity.fragment.ChapterFragment;
+import com.example.leisure.db.greendao.ComicBookBean;
 
 import androidx.annotation.Nullable;
 
@@ -19,34 +16,37 @@ import androidx.annotation.Nullable;
  * 显示漫画的所有章节
  * 缓存标记
  */
-public class ChapterActivity extends BaseActivity implements ChapterFragment.OnToolbarListener, ChapterFragment.OnChapterSelectedListener {
-    public static final String BUNDLE_KEY_CHAPTER = "key_chapter";
-    public static final String BUNDLE_KEY_TITLE = "key_title";
+public class ChapterActivity extends BaseActivity implements ChapterFragment.OnToolbarListener,
+        ChapterFragment.OnChapterSelectedListener {
+    public static final String BUNDLE_KEY_COMICBOOKBEAN = "key_comicbookbean";
 
-    private List<ComicItemBean.ChapterBean> mLsData;
-    private String mTitle;
-    private String mUrl;
+    private ComicBookBean mBook;
 
-    public static void startChapterActivity(Context context, List<ComicItemBean.ChapterBean> chapterBeanList,
-                                            String title, String url) {
+    public static void startChapterActivity(Context context, ComicBookBean bean) {
         Intent intent = new Intent(context, ChapterActivity.class);
-        intent.putExtra(BUNDLE_KEY_CHAPTER, (Serializable) chapterBeanList);
-        intent.putExtra(BUNDLE_KEY_TITLE, (Serializable) title);
-        intent.putExtra(ChapterFragment.BUNDLE_KEY_HURL1, url);
+        intent.putExtra(BUNDLE_KEY_COMICBOOKBEAN, bean);
         context.startActivity(intent);
     }
 
+
+    @Override
+    protected TransitionMode getOverridePendingTransitionMode() {
+        return TransitionMode.RIGHT;
+    }
+
+    @Override
+    protected boolean isHasStatusBar() {
+        return true;
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chapter);
 
-        mLsData = (List<ComicItemBean.ChapterBean>) getIntent().getSerializableExtra(BUNDLE_KEY_CHAPTER);
-        mTitle = getIntent().getStringExtra(BUNDLE_KEY_TITLE);
-        mUrl = getIntent().getStringExtra(ChapterFragment.BUNDLE_KEY_HURL1);
+        mBook = (ComicBookBean) getIntent().getSerializableExtra(BUNDLE_KEY_COMICBOOKBEAN);
 
-        ChapterFragment fragment = ChapterFragment.newInstance(mLsData, mTitle, mUrl);
+        ChapterFragment fragment = ChapterFragment.newInstance(mBook.lsChapter);
         fragment.addChapterSelectedListener(this);
 
         getSupportFragmentManager()
@@ -63,6 +63,6 @@ public class ChapterActivity extends BaseActivity implements ChapterFragment.OnT
     @Override
     public void onChapterSelected(int position) {
         //todo  跳转到漫画内容页
-        ComicContentActivity.startComicContentActivity(this, mLsData, position, mTitle, mUrl);
+        ComicContentActivity.startComicContentActivity(this, mBook);
     }
 }

@@ -1,5 +1,6 @@
 package com.example.leisure.bean;
 
+import com.example.leisure.db.greendao.ComicBookBean;
 import com.example.leisure.retrofit.BaseComicResponse;
 
 import java.util.List;
@@ -14,27 +15,6 @@ public class ComicListBean extends BaseComicResponse {
      * latest : 第47话大..大蒜！
      */
 
-    public List<ListBean> list;
-
-    public static class ListBean {
-        public String name;
-        public String url;
-        public String cover;
-        public String time;
-        public String latest;
-        public String author;
-        public String status;
-
-
-        /**
-         * number : 8
-         * pages : 2
-         * dpages : 9
-         */
-        public String number;
-        public String pages;
-        public String dpages;
-
-    }
+    public List<ComicBookBean> list;
 
 }

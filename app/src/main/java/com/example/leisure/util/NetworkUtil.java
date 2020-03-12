@@ -55,7 +55,11 @@ public class NetworkUtil {
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = mConnectivityManager.getActiveNetworkInfo();
         if (networkInfo != null) {
-            return networkInfo.getType() == ConnectivityManager.TYPE_WIFI ? true : false;
+            if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+//                Toast.makeText(context, R.string.net_not_connected_wifi, Toast.LENGTH_SHORT).show();
+                return true;
+            } else
+                return false;
         }
         return false;
     }

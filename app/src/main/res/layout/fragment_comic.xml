@@ -5,27 +5,28 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_height="38dp"
+        android:minWidth="20dp"
         app:tabBackground="@android:color/transparent"
-        app:tabGravity="fill"
-        app:tabIndicatorColor="@color/colorPrimaryDark"
-        app:tabIndicatorFullWidth="false"
-        app:tabMaxWidth="0dp"
+        app:tabGravity="center"
+        app:tabIndicatorHeight="0dp"
+        app:tabMaxWidth="120dp"
+        app:tabMode="scrollable"
+        app:tabPaddingEnd="-1dp"
+        app:tabPaddingStart="-1dp"
         app:tabRippleColor="@android:color/transparent"
         app:tabSelectedTextColor="@color/colorPrimaryDark"
-        app:tabTextColor="@color/textTitleColor"
-        app:tabMode="scrollable" />
-
+        app:tabTextAppearance="@style/TabLayoutTextSize_two"
+        app:tabTextColor="@color/textTitleColor" />
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/vp_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
 
 </LinearLayout>

@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:apps="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.ComicDetailsActivity">
+
+    <!--模拟状态栏占位-->
+    <View
+        android:id="@+id/view_status_bar"
+        style="@style/MyStatusBar" />
+
+    <com.example.leisure.widget.CommonToolbar
+        android:id="@+id/ctb_header"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/tabbarH"
+        android:layout_below="@id/view_status_bar"
+        android:background="@color/toolbarBlueBg"
+        apps:toolbar_left_drawable="@drawable/selector_back" />
+
+    <ImageView
+        android:id="@+id/iv_cover"
+        android:layout_width="105dp"
+        android:layout_height="140dp"
+        android:layout_below="@id/ctb_header"
+        android:layout_margin="@dimen/margin"
+        tools:src="@mipmap/ic_launcher" />
+
+    <TextView
+        android:id="@+id/tv_name"
+        style="@style/ItemTitleStyle"
+        android:layout_below="@id/ctb_header"
+        android:layout_marginTop="@dimen/margin"
+        android:layout_toRightOf="@id/iv_cover"
+        tools:text="绝世古尊" />
+
+    <TextView
+        android:id="@+id/tv_author"
+        style="@style/ItemDesStyle"
+        android:layout_below="@id/tv_name"
+        android:layout_alignLeft="@id/tv_name"
+        android:layout_marginTop="@dimen/imagePadding"
+        tools:text="作者:" />
+
+    <TextView
+        android:id="@+id/tv_tag"
+        style="@style/ItemDesStyle"
+        android:layout_below="@id/tv_author"
+        android:layout_alignLeft="@id/tv_author"
+        android:layout_marginTop="@dimen/imagePadding"
+        tools:text="类型:" />
+
+    <View
+        android:id="@+id/v_line"
+        style="@style/GrayHorizontalLine"
+        android:layout_below="@id/iv_cover" />
+
+    <RelativeLayout
+        android:id="@+id/rl_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/v_line"
+        android:visibility="gone">
+
+
+        <TextView
+            android:id="@+id/tv_jj"
+            style="@style/ItemTitleStyle"
+
+            android:layout_marginLeft="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
+            android:text="简介" />
+
+        <TextView
+            android:id="@+id/tv_zk"
+            style="@style/ItemDesStyle"
+            android:layout_alignParentRight="true"
+            android:padding="@dimen/margin"
+            android:text="展开" />
+
+        <TextView
+            android:id="@+id/tv_introduce"
+            style="@style/ItemDesStyle"
+            android:layout_below="@id/tv_jj"
+            android:layout_margin="@dimen/margin"
+            android:ellipsize="end"
+            android:maxLines="2"
+            tools:text="一场突如其来的的灾难降临，到底是有预谋，还是被殃及无辜？阴谋和阳谋的交织，迷雾重重………男" />
+
+        <View
+            android:id="@+id/v_line1"
+            style="@style/GrayHorizontalLine"
+            android:layout_below="@id/tv_introduce" />
+
+        <TextView
+            android:id="@+id/tv_zj"
+            style="@style/ItemTitleStyle"
+            android:layout_below="@id/v_line1"
+            android:layout_marginLeft="@dimen/margin"
+            android:layout_marginTop="@dimen/margin"
+            android:layout_marginBottom="@dimen/margin"
+            android:text="章节" />
+
+        <RelativeLayout
+            android:id="@+id/rl_zj"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_zj"
+            android:clickable="true"
+            android:paddingLeft="@dimen/margin">
+
+            <ImageView
+                android:id="@+id/iv_zj"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="@dimen/margin"
+                android:paddingTop="@dimen/imagePadding"
+                android:paddingBottom="@dimen/imagePadding"
+                android:src="@mipmap/ic_zj" />
+
+            <TextView
+                android:id="@+id/tv_time"
+                style="@style/ItemDesStyle"
+                android:layout_alignTop="@id/iv_zj"
+                android:layout_toRightOf="@id/iv_zj"
+                android:text="最近更新：" />
+
+            <TextView
+                android:id="@+id/tv_latest"
+                style="@style/ItemDesStyle"
+                android:layout_alignBottom="@id/iv_zj"
+                android:layout_toRightOf="@id/iv_zj"
+                android:text="更新至:" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="@dimen/margin"
+                android:src="@drawable/ic_arrow_right" />
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_bottom"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/tabbarH"
+            android:layout_alignParentBottom="true"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_add_or_remove"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/selector_white_top"
+                android:gravity="center"
+                android:textColor="@color/colorPrimaryDark"
+                tools:text="加入书架" />
+
+            <Button
+                android:id="@+id/btn_read"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/selector_read"
+                android:gravity="center"
+                android:text="立即阅读"
+                android:textColor="@color/loginTextColor" />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <include
+        layout="@layout/merge_prompt"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/v_line" />
+
+
+</RelativeLayout>

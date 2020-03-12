@@ -12,12 +12,6 @@ import java.io.Serializable;
  * 下载漫画书广播
  */
 public class DownloadReceiver extends BroadcastReceiver {
-    //    public static final String EXTRA_RECEIVER_STATE = "extra_receiver_state";
-//    public static final String EXTRA_TOTAL_COUNT = "extra_total_count";
-//    public static final String EXTRA_MAX_COUNT = "extra_max_count";
-//    public static final String EXTRA_CHAPTER_ID = "extra_chapter_id";
-//    public static final String EXTRA_PROGRESS = "extra_progress";
-//    public static final String EXTRA_BOOK_ID = "extra_book_id";
     public static final String EXTRA_RECEIVER_BEAN = "extra_receiver_bean";
     public static final String EXTRA_RECEIVER_CANCEL_BEAN = "extra_receiver_cancel_bean";
     public static final String EXTRA_RECEIVER_STATE = "extra_receiver_state";

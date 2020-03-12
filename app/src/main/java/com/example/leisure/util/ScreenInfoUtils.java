@@ -2,6 +2,7 @@ package com.example.leisure.util;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Build;
@@ -19,7 +20,7 @@ public class ScreenInfoUtils {
      *
      * @param activity 上下文
      */
-    public static void fullScreen(Activity activity) {
+    public static boolean fullScreen(Activity activity) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 //5.x开始需要把颜色设置透明，否则导航栏会呈现系统默认的浅灰色
@@ -42,7 +43,9 @@ public class ScreenInfoUtils {
 //                attributes.flags |= flagTranslucentNavigation;
                 window.setAttributes(attributes);
             }
+            return true;
         }
+        return false;
     }
 
     /**
@@ -154,5 +157,10 @@ public class ScreenInfoUtils {
             }
         }
         return mIsAllScreenDevice;
+    }
+
+    public static boolean isWindowOrientationLand(Context context) {
+        Configuration mConfiguration = context.getResources().getConfiguration(); //获取设置的配置信息
+        return mConfiguration.orientation == mConfiguration.ORIENTATION_LANDSCAPE;
     }
 }

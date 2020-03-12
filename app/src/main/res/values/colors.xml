@@ -1,29 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!--    <color name="test">#00000000</color>-->
-    <!--    &lt;!&ndash;    white&ndash;&gt;-->
-    <!--    <color name="colorWhite">#FFFFFF</color>-->
-    <!--    <color name="colorWhiteFFFDF9">#FFFDF9</color>-->
-    <!--    <color name="colorWhiteE6E6E6">#E6E6E6</color>-->
-    <!--    <color name="colorWhiteFAFCF8">#FAFCF8</color>-->
-    <!--    <color name="colorWhite80FAFCF8">#80FAFCF8</color>-->
-
-
-    <!--    &lt;!&ndash;    gray&ndash;&gt;-->
-    <!--    <color name="colorGray">#55888888</color>-->
-    <!--    <color name="colorGray8E8E8E">#8E8E8E</color>-->
-
-
-    <!--    &lt;!&ndash;    black&ndash;&gt;-->
-    <!--    <color name="colorBlack">#000000</color>-->
-    <!--    <color name="colorBlack2D2D2D">#2D2D2D</color>-->
-
-    <!--    &lt;!&ndash;    blue&ndash;&gt;-->
-    <!--    <color name="colorBlue38ACFF">#38ACFF</color>-->
-    <!--    <color name="colorBlue528E99">#528E99</color>-->
-    <!--    <color name="colorBlue11368c">#11368c</color>-->
-    <!--    <color name="colorBlue3879CB">#3879CB</color>-->
-    <!--    <color name="colorBlue4D0E6">#c4d0e6</color>-->
     <color name="colorPrimary">#38ACFF</color>
     <color name="colorPrimaryDark">#1592C4</color>
     <color name="colorAccent">#E6E6E6</color>
@@ -37,6 +13,8 @@
     <color name="textTimeColor">#8E8E8E</color>
     <color name="textHeaderColor">#8E8E8E</color>
     <color name="textReadingColor">#E61A5F</color>
+    <color name="textCacheClickColor">#9E9E9E</color>
+    <color name="home_light">#FFA028</color>
 
 
     <!--    background-->

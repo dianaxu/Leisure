@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:drawable="@drawable/comic">
+
+    <!--    颜色-->
+    <target android:name="book_one">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator
+                    android:duration="100"
+                    android:propertyName="fillColor"
+                    android:startOffset="100"
+                    android:valueFrom="@color/home_light"
+                    android:valueTo="@color/tabTextStartColor"
+                    android:valueType="colorType" />
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="book_two">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator
+                    android:duration="100"
+                    android:propertyName="fillColor"
+                    android:valueFrom="@color/textTitleColor"
+                    android:valueTo="@color/tabTextStartColor"
+                    android:valueType="colorType" />
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="book_three">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator
+                    android:duration="100"
+                    android:propertyName="fillColor"
+                    android:valueFrom="@color/textTitleColor"
+                    android:valueTo="@color/tabTextStartColor"
+                    android:valueType="colorType" />
+            </set>
+        </aapt:attr>
+    </target>
+</animated-vector>

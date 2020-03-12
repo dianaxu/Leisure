@@ -8,7 +8,6 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.IBinder;
-import android.util.Log;
 
 import com.danikula.videocache.HttpProxyCacheServer;
 import com.example.leisure.db.greendao.DaoManager;
@@ -16,7 +15,6 @@ import com.example.leisure.greenDao.gen.DaoSession;
 import com.example.leisure.retrofit.RetrofitComicUtils;
 import com.example.leisure.retrofit.RetrofitUtils;
 import com.example.leisure.service.DownloadService;
-import com.example.leisure.service.TestService;
 import com.example.leisure.util.Constant;
 
 import java.io.File;
@@ -55,36 +53,18 @@ public class MainApplication extends Application {
         return mApp;
     }
 
-    private TestService mService;
     private boolean isCon = false;
-    private ServiceConnection mConn = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            TestService.TestBinder binder = (TestService.TestBinder) service;
-            mService = binder.getTestService();
-            isCon = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            isCon = false;
-        }
-    };
 
     @Override
     public void onCreate() {
-        Log.e(TAG, "MainApplication->onCreate: ");
         initBaseApi();
         initGreenDao();
         getBaseDataBySharedPref();
-//        Intent intent = new Intent(this, TestService.class);
-//        bindService(intent, mConn, BIND_AUTO_CREATE);
+
         Intent intent = new Intent(this, DownloadService.class);
         bindService(intent, mDownloadConn, BIND_AUTO_CREATE);
         super.onCreate();
         mApp = this;
-
-
     }
 
     private void getBaseDataBySharedPref() {
@@ -123,8 +103,7 @@ public class MainApplication extends Application {
      * //
      */
     private void initGreenDao() {
-        DaoManager mDaoManager = DaoManager.getInstance();
-        mDaoManager.init(this);
+        DaoManager mDaoManager = DaoManager.getInstance(this);
         mDaoSession = mDaoManager.getDaoSession();
     }
 
@@ -157,13 +136,6 @@ public class MainApplication extends Application {
 
     public DaoSession getDaoSession() {
         return mDaoSession;
-    }
-
-    public TestService getTestService() {
-        if (isCon) {
-            return mService;
-        }
-        return null;
     }
 
     public DownloadService getDownloadService() {

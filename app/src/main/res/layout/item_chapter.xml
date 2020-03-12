@@ -19,7 +19,6 @@
         style="@style/ItemDesStyle"
         android:layout_gravity="center_vertical"
         android:layout_marginRight="@dimen/margin"
-        android:text="已缓存"
-        android:visibility="gone" />
+        android:text="已缓存" />
 
 </LinearLayout>

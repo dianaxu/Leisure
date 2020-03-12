@@ -31,6 +31,15 @@ public class LogonActivity extends BaseActivity {
     private UserInfoBean mUserBean = new UserInfoBean();
 
     @Override
+    protected TransitionMode getOverridePendingTransitionMode() {
+        return TransitionMode.RIGHT;
+    }
+
+    @Override
+    protected boolean isHasStatusBar() {
+        return true;
+    }
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_logon_dev);

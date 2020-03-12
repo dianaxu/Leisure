@@ -24,13 +24,14 @@ import androidx.annotation.Nullable;
 public class CommonToolbar extends FrameLayout implements View.OnClickListener {
 
     private ImageView mIvLeft, mIvRight;
-    private TextView mTvTitle;
+    private TextView mTvTitle, mTvRight;
     private LinearLayout mLlSearch;
     private TextView mTvSearch;
 
     private OnLeftDrawableClickListener mLeftListener;
     private OnRightDrawableClickListener mRightListener;
     private OnSearchClickListener mSearchListener;
+    private OnRightTextClickListener mRightTextListener;
 
 
     public CommonToolbar(@NonNull Context context, @Nullable AttributeSet attrs) {
@@ -53,6 +54,8 @@ public class CommonToolbar extends FrameLayout implements View.OnClickListener {
         String hint = typedArray.getString(R.styleable.CommonToolbar_toolbar_search_hint);
         boolean isShowTitle = typedArray.getBoolean(R.styleable.CommonToolbar_toolbar_text_enable, true);
 
+        String rightText = typedArray.getString(R.styleable.CommonToolbar_toolbar_right_text);
+
         typedArray.recycle();
 
         mIvLeft = findViewById(R.id.iv_left);
@@ -60,10 +63,12 @@ public class CommonToolbar extends FrameLayout implements View.OnClickListener {
         mTvTitle = findViewById(R.id.tv_title);
         mLlSearch = findViewById(R.id.ll_search);
         mTvSearch = findViewById(R.id.tv_search);
+        mTvRight = findViewById(R.id.tv_right);
 
         mIvLeft.setOnClickListener(this);
         mIvRight.setOnClickListener(this);
         mLlSearch.setOnClickListener(this);
+        mTvRight.setOnClickListener(this);
 
         setLeftDrawable(leftDrawable);
         setRightDrawable(rightDrawable);
@@ -72,6 +77,7 @@ public class CommonToolbar extends FrameLayout implements View.OnClickListener {
         setTextColor(textColor);
         setTitleEnable(isShowTitle);
         setSearchEnable(isShowSearch);
+        setRightText(rightText);
         mTvSearch.setText(hint);
     }
 
@@ -107,12 +113,20 @@ public class CommonToolbar extends FrameLayout implements View.OnClickListener {
         this.mSearchListener = listener;
     }
 
+    public void setRightTextClickListener(OnRightTextClickListener listener) {
+        this.mRightTextListener = listener;
+    }
+
     public void setSearchEnable(boolean enable) {
         this.mLlSearch.setVisibility(enable ? VISIBLE : GONE);
     }
 
     public void setTitleEnable(boolean enable) {
         this.mTvTitle.setVisibility(enable ? VISIBLE : GONE);
+    }
+
+    public void setRightText(String text) {
+        this.mTvRight.setText(text);
     }
 
     @Override
@@ -130,6 +144,10 @@ public class CommonToolbar extends FrameLayout implements View.OnClickListener {
             if (mSearchListener != null) {
                 mSearchListener.onSearchClick();
             }
+        } else if (R.id.tv_right == id) {
+            if (mRightTextListener != null) {
+                mRightTextListener.onRightClick(v);
+            }
         }
 
     }
@@ -144,5 +162,9 @@ public class CommonToolbar extends FrameLayout implements View.OnClickListener {
 
     public interface OnSearchClickListener {
         void onSearchClick();
+    }
+
+    public interface OnRightTextClickListener {
+        void onRightClick(View view);
     }
 }

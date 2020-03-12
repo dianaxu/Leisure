@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rl_bar"
     android:layout_width="match_parent"
     android:layout_height="@dimen/tabbarH"
@@ -12,8 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_centerVertical="true"
-        android:src="@android:drawable/stat_sys_warning" />
+        android:layout_centerVertical="true" />
 
     <LinearLayout
         android:id="@+id/ll_search"
@@ -35,7 +35,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:src="@mipmap/ic_search" />
+            android:src="@drawable/selector_search" />
 
         <TextView
             android:id="@+id/tv_search"
@@ -49,11 +49,12 @@
 
     <TextView
         android:id="@+id/tv_title"
-        style="@style/BaseTextView.BlueShadow"
+        style="@style/BaseTextView.BlackText"
         android:layout_centerInParent="true"
         android:layout_gravity="center"
         android:textSize="@dimen/tabbarTextS"
-        android:visibility="gone" />
+        tools:text="名侦探柯南"
+        android:visibility="visible" />
 
     <ImageView
         android:id="@+id/iv_right"
@@ -62,6 +63,16 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:padding="@dimen/margin" />
+
+    <TextView
+        android:id="@+id/tv_right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:padding="@dimen/imagePadding"
+        android:textSize="@dimen/itemTitleS"
+        tools:text="正序" />
 
 
 </RelativeLayout>

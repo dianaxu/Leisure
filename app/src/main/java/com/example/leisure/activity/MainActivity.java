@@ -1,9 +1,7 @@
 package com.example.leisure.activity;
 
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
@@ -12,14 +10,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.leisure.R;
-import com.example.leisure.fragment.BookShelfFragment;
-import com.example.leisure.fragment.ComicFragment;
-import com.example.leisure.fragment.LeftMenuFragment;
+import com.example.leisure.activity.fragment.BookShelfFragment;
+import com.example.leisure.activity.fragment.ComicFragment;
+import com.example.leisure.activity.fragment.LeftMenuFragment;
 import com.example.leisure.util.ScreenInfoUtils;
 import com.example.leisure.widget.GradualTabView;
 import com.nineoldandroids.view.ViewHelper;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -27,9 +24,7 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
@@ -38,8 +33,10 @@ import androidx.viewpager.widget.ViewPager;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    public static final String BUNDLE_KEY_POS = "bundle_key_pos";
+public class MainActivity extends BaseActivity implements View.OnClickListener {
+    //    private static final String BUNDLE_KEY_POS = "key_pos";
+    private static final String BUNDLE_KEY_CURRENT_PAGE = "key_current_page";
+
     private final String TAG = "MainActivity";
 
     private View mStatusbar;
@@ -54,24 +51,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private List<String> mTabTitles = new ArrayList<>();
     private SparseArray<Fragment> mTabFragments = new SparseArray();
     private List<GradualTabView> mGradualTabViews = new ArrayList<>();
-    private int mSavePosition;
+    private int mCurrentPage;
 
+
+    @Override
+    protected TransitionMode getOverridePendingTransitionMode() {
+        return TransitionMode.BOTTOM;
+    }
+
+    @Override
+    protected boolean isHasStatusBar() {
+        return true;
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (savedInstanceState != null) {
-            mSavePosition = savedInstanceState.getInt(BUNDLE_KEY_POS, 0);
+//            mSavePosition = savedInstanceState.getInt(BUNDLE_KEY_POS, 0);
+            mCurrentPage = savedInstanceState.getInt(BUNDLE_KEY_CURRENT_PAGE, 0);
         }
 
         setContentView(R.layout.activity_main);
         //获取屏幕宽度
         final int width = ScreenInfoUtils.getWindowWidth(this);
-        //获取屏幕高度
-        final int height = ScreenInfoUtils.getFullActivityHeight(this);
 
         initView();
-        initStatusBar();
         initToolbar();
         initMenu(width);
         initDrawerLayout(width);
@@ -82,15 +87,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mToolbar.setNavigationIcon(R.drawable.ic_header);
         //隐藏原标题
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        setToolbarTitle(0);
-
-        setCurrrentTab(0);
+        mVpContent.setCurrentItem(mCurrentPage);
+        setToolbarTitle(mCurrentPage);
+        setIvSearch(mCurrentPage);
+        setCurrrentTab(mCurrentPage);
     }
 
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putInt(BUNDLE_KEY_POS, mVpContent.getCurrentItem());
+        outState.putInt(BUNDLE_KEY_CURRENT_PAGE, mVpContent.getCurrentItem());
         super.onSaveInstanceState(outState);
 
     }
@@ -99,8 +105,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 初始化底部导航栏
      */
     private void initGradualTabView() {
-        mGradualTabViews.add(mGtvBookshelf);
         mGradualTabViews.add(mGtvComic);
+        mGradualTabViews.add(mGtvBookshelf);
 
         int sie = mGradualTabViews.size();
         for (int i = 0; i < sie; i++) {
@@ -112,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     mVpContent.setCurrentItem(finalI, false);
                     setCurrrentTab(finalI);
                     setToolbarTitle(finalI);
-                    mIvSearch.setVisibility(finalI == 0 ? View.GONE : View.VISIBLE);
+                    setIvSearch(finalI);
                 }
             });
         }
@@ -132,10 +138,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Fragment fragment = null;
                 switch (position) {
                     case 0:
-                        fragment = BookShelfFragment.newInstance();
+                        fragment = ComicFragment.newInstance();
                         break;
                     case 1:
-                        fragment = ComicFragment.newInstance();
+                        fragment = BookShelfFragment.newInstance();
                         break;
                     default:
                         break;
@@ -183,7 +189,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onPageSelected(int position) {
                 mVpContent.setCurrentItem(position);
                 setToolbarTitle(position);
-                mIvSearch.setVisibility(position == 0 ? View.GONE : View.VISIBLE);
+
+                setIvSearch(position);
             }
 
             @Override
@@ -192,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-        mVpContent.setCurrentItem(mSavePosition);
+
     }
 
     /**
@@ -276,18 +283,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         toggle.syncState();
     }
 
-    /**
-     * 初始化状态栏
-     */
-    private void initStatusBar() {
-        //隐藏状态栏时，获取状态栏高度
-        int statusBarHeight = ScreenInfoUtils.getStatusBarHeight(this);
-        ScreenInfoUtils.fullScreen(this);
-
-        //初始化状态栏的高度
-        ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(MATCH_PARENT, statusBarHeight);
-        mStatusbar.setLayoutParams(params);
-    }
 
     /**
      * 初始化控件
@@ -333,6 +328,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     private void setToolbarTitle(int position) {
         mTvTitle.setText(mTabTitles.get(position));
+    }
+
+    private void setIvSearch(int position) {
+        mIvSearch.setVisibility(position == 1 ? View.GONE : View.VISIBLE);
     }
 
     @Override

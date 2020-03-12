@@ -3,34 +3,63 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
+    android:background="@color/contentBg"
     android:orientation="vertical">
 
-    <com.example.leisure.widget.CommonToolbar
-        android:id="@+id/ctb_header"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/tabbarH"
-        android:background="@color/toolbarBlueBg"
-        app:toolbar_left_drawable="@drawable/selector_back"
-        app:toolbar_text="搜索漫画"
-        app:toolbar_text_color="@color/loginTextColor" />
+    <!--模拟状态栏占位-->
+    <View
+        android:id="@+id/view_status_bar"
+        style="@style/MyStatusBar" />
+
+    <!--    <com.example.leisure.widget.CommonToolbar-->
+    <!--        android:id="@+id/ctb_header"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="@dimen/tabbarH"-->
+    <!--        android:background="@color/toolbarBlueBg"-->
+    <!--        app:toolbar_left_drawable="@drawable/selector_back"-->
+    <!--        app:toolbar_text="搜索漫画"-->
+    <!--        app:toolbar_text_color="@color/loginTextColor" />-->
 
     <!--    搜索框-->
-    <include
-        layout="@layout/merge_search"
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/margin"
-        android:layout_marginTop="@dimen/imagePadding"
-        android:layout_marginRight="@dimen/margin"
-        android:layout_marginBottom="@dimen/imagePadding" />
+        android:paddingTop="@dimen/imagePadding">
+
+        <include
+            android:id="@+id/i_search"
+            layout="@layout/merge_search"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/imagePadding"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/tv_cancel" />
+
+        <TextView
+            android:id="@+id/tv_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:paddingLeft="4dp"
+            android:paddingRight="@dimen/margin"
+            android:text="取消"
+            android:textColor="@color/colorPrimaryDark"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/i_search"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <!--    最近搜索-->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_old_search"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/imagePadding"
+        android:background="@color/itemBg"
         android:visibility="visible" />
 
     <!--    搜索结果-->
@@ -38,6 +67,8 @@
         android:id="@+id/rv_result"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/imagePadding"
+        android:background="@color/itemBg"
         android:visibility="gone" />
 
 </LinearLayout>

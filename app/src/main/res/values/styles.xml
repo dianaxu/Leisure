@@ -9,6 +9,7 @@
 
     </style>
 
+
     <!--   全屏模式-->
     <style name="MyTheme" parent="AppTheme">
         <item name="android:windowNoTitle">true</item>//无标题
@@ -26,8 +27,7 @@
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_weight">1</item>
-        <item name="icon">@drawable/find</item>
-        <item name="icon_selected">@drawable/find_select</item>
+
         <item name="text_end_color">@color/tabTextEndColor</item>
         <item name="text_start_color">@color/tabTextStartColor</item>
     </style>
@@ -45,6 +45,10 @@
 
     <style name="BaseTextView.BlueShadow" parent="BaseTextView">
         <item name="android:shadowColor">@color/textBlueShadow</item>
+    </style>
+
+    <style name="BaseTextView.BlackText" parent="BaseTextView">
+        <item name="android:textColor">@color/tabTextEndColor</item>
     </style>
 
     <style name="BaseSelectorTextView">
@@ -149,6 +153,15 @@
         <item name="android:textColor">@color/textTitleColor</item>
         <item name="android:textSize">@dimen/itemTitleS</item>
     </style>
+
+    <style name="TvTitleMatch" parent="ItemTitleStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:background">@drawable/selector_white_to_gray</item>
+        <item name="android:clickable">true</item>
+        <item name="android:drawableRight">@drawable/ic_arrow_right</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:padding">@dimen/margin</item>
+    </style>
     <!--    item desc style-->
     <style name="ItemDesStyle">
         <item name="android:layout_width">wrap_content</item>
@@ -157,4 +170,31 @@
         <item name="android:textSize">@dimen/itemDesS</item>
     </style>
 
+
+    <style name="CustomDialog" parent="android:style/Theme.Dialog">
+        <item name="android:windowFrame">@null</item> <!--边框-->
+        <item name="android:windowIsFloating">true</item> <!--是否浮现在activity之上-->
+        <item name="android:windowIsTranslucent">true</item> <!--半透明-->
+        <item name="android:windowNoTitle">true</item> <!--无标题-->
+        <item name="android:background">@android:color/transparent</item> <!--背景透明-->
+        <item name="android:windowBackground">@android:color/transparent</item> <!--背景透明-->
+        <item name="android:backgroundDimEnabled">true</item> <!--模糊-->
+        <item name="android:backgroundDimAmount">0.6</item>  <!--背景透明度-->
+    </style>
+
+    <style name="dialogWindowAnim" mce_bogus="1" parent="android:Animation">
+        <item name="android:windowEnterAnimation">@anim/dialog_enter</item>
+        <item name="android:windowExitAnimation">@anim/dialog_exit</item>
+    </style>
+
+    <!--设置Tablayout字体大小-->
+    <style name="TabLayoutTextSize">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/colorPrimaryDark</item>
+    </style>
+    <!--设置Tablayout字体大小-->
+    <style name="TabLayoutTextSize_two">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/textTitleColor</item>
+    </style>
 </resources>

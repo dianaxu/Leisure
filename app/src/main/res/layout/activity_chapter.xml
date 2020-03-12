@@ -4,6 +4,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <!--模拟状态栏占位-->
+    <View
+        android:id="@+id/view_status_bar"
+        style="@style/MyStatusBar"
+        android:background="@color/chapterBg" />
+
     <FrameLayout
         android:id="@+id/fragment"
         android:layout_width="match_parent"

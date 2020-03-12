@@ -57,7 +57,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:padding="@dimen/imagePadding"
-                android:src="@drawable/ic_cloud_done" />
+                android:src="@drawable/selector_menu" />
 
             <TextView
                 android:id="@+id/tv_caching"
@@ -68,7 +68,7 @@
                 android:layout_centerVertical="true"
                 android:padding="@dimen/imagePadding"
                 android:text="缓 存"
-                android:textColor="@color/colorAccent" />
+                android:textColor="@drawable/selector_color_white_gray" />
 
         </RelativeLayout>
 

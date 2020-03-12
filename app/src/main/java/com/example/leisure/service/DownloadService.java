@@ -2,17 +2,19 @@ package com.example.leisure.service;
 
 import android.app.Service;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
 import com.example.leisure.MainApplication;
-import com.example.leisure.db.greendao.BookChapter;
-import com.example.leisure.db.greendao.BookShelf;
-import com.example.leisure.db.greendao.ChapterDetail;
-import com.example.leisure.greenDao.gen.BookChapterDao;
-import com.example.leisure.greenDao.gen.BookShelfDao;
-import com.example.leisure.greenDao.gen.ChapterDetailDao;
+import com.example.leisure.R;
+import com.example.leisure.db.greendao.ComicBookBean;
+import com.example.leisure.db.greendao.ComicChapterBean;
+import com.example.leisure.db.greendao.ComicImageBean;
+import com.example.leisure.greenDao.gen.ComicBookBeanDao;
+import com.example.leisure.greenDao.gen.ComicChapterBeanDao;
+import com.example.leisure.greenDao.gen.ComicImageBeanDao;
 import com.example.leisure.greenDao.gen.DaoSession;
 import com.example.leisure.receiver.DownloadReceiver;
 import com.example.leisure.util.Constant;
@@ -32,9 +34,9 @@ public class DownloadService extends Service {
     private DaoSession mDaoSession;
     private LinkedHashMap<Long, DownloadTask> mLsTask = new LinkedHashMap<>();
 
-    private BookShelf mBook;
+    private ComicBookBean mBook;
     private long mChapterId = -1;
-    private long mBookChapterCount = 0;
+    private long mComicChapterBeanCount = 0;
     private long mLastUpdateTime = System.currentTimeMillis();             //最后更新的时间
     private long mUpdateTimeInterval = 830;  //UI更新时间的间隔
 
@@ -45,7 +47,7 @@ public class DownloadService extends Service {
         }
 
         @Override
-        public void onProgressUpdate(BookChapter bean, ChapterDetail detail) {
+        public void onProgressUpdate(ComicChapterBean bean, ComicImageBean detail) {
             updateCacheProgress(detail, bean);
 
             //发送更新广播
@@ -53,7 +55,7 @@ public class DownloadService extends Service {
         }
 
         @Override
-        public void onFinish(BookChapter bean) {
+        public void onFinish(ComicChapterBean bean) {
             Log.e(TAG1, bean.get_id() + " onFinish: " + (bean.getMaxCount() == bean.getCacheCount()));
             //全部下载完
             updateChapterCacheProgress(bean);
@@ -61,15 +63,19 @@ public class DownloadService extends Service {
             //发送更新广播
             sendDownloadReceiver(bean, true);
             if (mLsTask != null && mLsTask.get(bean.get_id()) != null) {
-                mLsTask.get(bean.get_id()).cancel(true);
+                mLsTask.get(bean.get_id()).cancelTask();
                 mLsTask.remove(bean.get_id());
             }
         }
 
         @Override
-        public void onFail(long chapterId) {
-            Log.e(TAG1, chapterId + "  onFail: ");
-            sendDownloadReceiver(Constant.DownloadReceiverState.PROMPT_FAIL, chapterId, "下载失败");
+        public void onFail(long chapterId, boolean isConnWifi) {
+            String msg = "下载失败";
+            if (!isConnWifi) {
+                cancelTask();
+                msg = (String) getResources().getText(R.string.net_not_connected_wifi);
+            }
+            sendDownloadReceiver(Constant.DownloadReceiverState.PROMPT_FAIL, chapterId, msg);
         }
     };
 
@@ -99,7 +105,7 @@ public class DownloadService extends Service {
     public void startTask() {
         if (mLsTask.size() > 0) return;
         //获取需要下载的所有章节集
-        List<BookChapter> lsChapter = mDaoSession.getBookChapterDao().queryRaw("where Cache_State = ? ",
+        List<ComicChapterBean> lsChapter = mDaoSession.getComicChapterBeanDao().queryRaw("where Cache_State = ? ",
                 String.valueOf(Constant.DownloadState.DOWNLOADING));
         if (lsChapter.size() == 0) {
             stopSelf();
@@ -108,11 +114,11 @@ public class DownloadService extends Service {
 
         //按照章节开始启动线程来下载
         for (int i = 0; i < lsChapter.size(); i++) {
-            BookChapter chapter = lsChapter.get(i);
+            ComicChapterBean chapter = lsChapter.get(i);
             //情况1：章节的maxCount=cachecount
             if (chapter.getMaxCount() > 0 && chapter.getMaxCount() == chapter.getCacheState()) {
                 if (mBook == null || mBook.get_id() != chapter.getBookId()) {
-                    mBook = mDaoSession.getBookShelfDao().queryBuilder().where(BookShelfDao.Properties._id.eq(chapter.getBookId())).unique();
+                    mBook = mDaoSession.getComicBookBeanDao().queryBuilder().where(ComicBookBeanDao.Properties._id.eq(chapter.getBookId())).unique();
                 }
 
                 updateChapterCacheProgress(chapter);
@@ -122,9 +128,9 @@ public class DownloadService extends Service {
                 continue;
             } else if (chapter.getMaxCount() > 0 && chapter.getMaxCount() != chapter.getCacheState()) {
                 //情况2：章节的maxCount!=cachecount 但是图片已经下载完了
-                long count = mDaoSession.getChapterDetailDao().queryBuilder()
-                        .where(ChapterDetailDao.Properties.ChapterId.eq(chapter.get_id()),
-                                ChapterDetailDao.Properties.IsCaching.eq(true))
+                long count = mDaoSession.getComicImageBeanDao().queryBuilder()
+                        .where(ComicImageBeanDao.Properties.ChapterId.eq(chapter.get_id()),
+                                ComicImageBeanDao.Properties.IsCaching.eq(true))
                         .count();
                 if (count == chapter.getMaxCount()) {
                     chapter.setCacheCount((int) count);
@@ -154,32 +160,49 @@ public class DownloadService extends Service {
         return mLsTask.size() > 0;
     }
 
-    private void updateCacheProgress(ChapterDetail detail, BookChapter bean) {
-        //更新 ChapterDetail表
+    private void updateCacheProgress(ComicImageBean detail, ComicChapterBean bean) {
+        //更新 ComicImageBean表
         if (detail != null)
-            mDaoSession.getChapterDetailDao().update(detail);
+            mDaoSession.getComicImageBeanDao().update(detail);
 
         //初始化漫画书
         if (mBook == null || mBook.get_id() != bean.getBookId()) {
-            mBook = mDaoSession.getBookShelfDao().queryBuilder()
-                    .where(BookShelfDao.Properties._id.eq(bean.getBookId()))
+            mBook = mDaoSession.getComicBookBeanDao().queryBuilder()
+                    .where(ComicBookBeanDao.Properties._id.eq(bean.getBookId()))
                     .unique();
-            mBookChapterCount = mDaoSession.getBookChapterDao().queryBuilder()
-                    .where(BookChapterDao.Properties.BookId.eq(bean.getBookId()))
+            mComicChapterBeanCount = mDaoSession.getComicChapterBeanDao().queryBuilder()
+                    .where(ComicChapterBeanDao.Properties.BookId.eq(bean.getBookId()))
                     .count();
         }
 
+        //更新ComicChapterBean表
+        mDaoSession.getComicChapterBeanDao().update(bean);
 
         Log.e(TAG1, "updateCacheProgress: " + bean.get_id() + ":" + bean.getCacheCount() + ":" + bean.getMaxCount());
         //完成一个图片下载 占这本书的进度
-        float progress = (float) (1.0 / mBookChapterCount * 1.0 / bean.getMaxCount());
-        mBook.setProgress(mBook.getProgress() + progress);
+        float progress = (float) (1.0 / mComicChapterBeanCount * 1.0 / bean.getMaxCount());
+        if (mBook.getProgress() == Float.POSITIVE_INFINITY || mBook.getProgress() == Float.NEGATIVE_INFINITY) {
+            progress = caleBookProgress(mBook.get_id());
+            mBook.setProgress(progress);
+        } else
+            mBook.setProgress(mBook.getProgress() + progress);
 
-        //更新BookChapter表
-        mDaoSession.getBookChapterDao().update(bean);
-        //更新BookShelf表
-        mDaoSession.getBookShelfDao().update(mBook);
 
+        //更新ComicBookBean表
+        mDaoSession.getComicBookBeanDao().update(mBook);
+
+    }
+
+    private float caleBookProgress(long bookId) {
+        int chapterCount = (int) mDaoSession.getComicChapterBeanDao().queryBuilder().where(ComicChapterBeanDao.Properties.BookId.eq(bookId)).count();
+
+        String sqlStr = "select sum(round(Cast(cache_count as float)/max_count/? ,5) )as sum " +
+                " from comic_chapter_bean where book_id = ? and cache_count != 0;";
+        Cursor cursor = mDaoSession.getDatabase().rawQuery(sqlStr, new String[]{String.valueOf(chapterCount), String.valueOf(bookId)});
+        cursor.moveToFirst();
+        float progress = cursor.getFloat(0);
+        cursor.close();
+        return progress;
     }
 
     /**
@@ -187,39 +210,39 @@ public class DownloadService extends Service {
      *
      * @param bean
      */
-    private void updateChapterCacheProgress(BookChapter bean) {
+    private void updateChapterCacheProgress(ComicChapterBean bean) {
         //更新章节完成状态  默认取消状态，方便下次进来直接开启
         bean.setCacheState(Constant.DownloadState.DOWNLOAD_CANCEL);
         if (bean.getMaxCount() > 0 && bean.getMaxCount() == bean.getCacheCount()) {
             bean.setIsCaching(true);
             bean.setCacheState(Constant.DownloadState.DOWNLOADED);
         }
-        mDaoSession.getBookChapterDao().update(bean);
+        mDaoSession.getComicChapterBeanDao().update(bean);
     }
 
-    private BookShelf updateBookCacheProgress(long bookId) {
+    private ComicBookBean updateBookCacheProgress(long bookId) {
         //更新漫画书的完成状态
-        BookShelf book = mDaoSession.getBookShelfDao().queryBuilder()
-                .where(BookShelfDao.Properties._id.eq(bookId))
+        ComicBookBean book = mDaoSession.getComicBookBeanDao().queryBuilder()
+                .where(ComicBookBeanDao.Properties._id.eq(bookId))
                 .unique();
         int cacheState = Constant.DownloadState.DOWNLOADING;
         if (book.getProgress() == 1) {
             cacheState = Constant.DownloadState.DOWNLOADED;
         } else {
             //正在下载的数量
-            long downCount = mDaoSession.getBookChapterDao().queryBuilder()
-                    .where(BookChapterDao.Properties.BookId.eq(bookId)
-                            , BookChapterDao.Properties.CacheState.eq(
+            long downCount = mDaoSession.getComicChapterBeanDao().queryBuilder()
+                    .where(ComicChapterBeanDao.Properties.BookId.eq(bookId)
+                            , ComicChapterBeanDao.Properties.CacheState.eq(
                                     Constant.DownloadState.DOWNLOADING)).count();
             //取消数量
-            long cancelCount = mDaoSession.getBookChapterDao().queryBuilder()
-                    .where(BookChapterDao.Properties.BookId.eq(bookId)
-                            , BookChapterDao.Properties.CacheState.eq(
+            long cancelCount = mDaoSession.getComicChapterBeanDao().queryBuilder()
+                    .where(ComicChapterBeanDao.Properties.BookId.eq(bookId)
+                            , ComicChapterBeanDao.Properties.CacheState.eq(
                                     Constant.DownloadState.DOWNLOAD_CANCEL)).count();
             //默认数量
-            long defaultCount = mDaoSession.getBookChapterDao().queryBuilder()
-                    .where(BookChapterDao.Properties.BookId.eq(bookId)
-                            , BookChapterDao.Properties.CacheState.eq(
+            long defaultCount = mDaoSession.getComicChapterBeanDao().queryBuilder()
+                    .where(ComicChapterBeanDao.Properties.BookId.eq(bookId)
+                            , ComicChapterBeanDao.Properties.CacheState.eq(
                                     Constant.DownloadState.DOWNLOAD_NOT)).count();
             if (downCount == 0 && cancelCount > 0) {
                 cacheState = Constant.DownloadState.DOWNLOAD_CANCEL;
@@ -232,14 +255,14 @@ public class DownloadService extends Service {
         return book;
     }
 
-    private BookShelf updateBookShelf(long bookId, int state) {
+    private ComicBookBean updateComicBookBean(long bookId, int state) {
         //更新书架表的缓存数据
-        BookShelf book = mDaoSession.getBookShelfDao().queryBuilder()
-                .where(BookShelfDao.Properties._id.eq(bookId))
+        ComicBookBean book = mDaoSession.getComicBookBeanDao().queryBuilder()
+                .where(ComicBookBeanDao.Properties._id.eq(bookId))
                 .unique();
 
         book.setCacheState(state);
-        mDaoSession.getBookShelfDao().update(book);
+        mDaoSession.getComicBookBeanDao().update(book);
         return book;
     }
 
@@ -254,62 +277,62 @@ public class DownloadService extends Service {
     }
 
     private void updateChapterCacheState(int state, long... chapterIds) {
-        List<BookChapter> chapters = mDaoSession.getBookChapterDao()
+        List<ComicChapterBean> chapters = mDaoSession.getComicChapterBeanDao()
                 .queryRaw("where _id in (?)", whereArgStr(chapterIds));
-        for (BookChapter chapter : chapters) {
+        for (ComicChapterBean chapter : chapters) {
             chapter.setCacheState(state);
         }
-        mDaoSession.getBookChapterDao().updateInTx(chapters);
+        mDaoSession.getComicChapterBeanDao().updateInTx(chapters);
     }
 
     private List<Long> updateChapterCacheState(long... bookIds) {
         String argStr = whereArgStr();
 
         List<Long> chapterIds = new ArrayList<>();
-        List<BookChapter> chapters = mDaoSession.getBookChapterDao()
+        List<ComicChapterBean> chapters = mDaoSession.getComicChapterBeanDao()
                 .queryRaw("where _id in (?) and Cache_State = ?",
                         new String[]{argStr, String.valueOf(Constant.DownloadState.DOWNLOADING)});
         if (chapters.size() == 0) return null;
 
-        for (BookChapter chapter : chapters) {
+        for (ComicChapterBean chapter : chapters) {
             chapterIds.add(chapter.get_id());
             chapter.setCacheState(Constant.DownloadState.DOWNLOAD_CANCEL);
         }
-        mDaoSession.getBookChapterDao().updateInTx(chapters);
+        mDaoSession.getComicChapterBeanDao().updateInTx(chapters);
         return chapterIds;
     }
 
     private void updateChapterCacheState() {
-        List<BookChapter> chapters = mDaoSession.getBookChapterDao().queryBuilder()
-                .where(BookChapterDao.Properties.CacheState.eq(Constant.DownloadState.DOWNLOADING))
+        List<ComicChapterBean> chapters = mDaoSession.getComicChapterBeanDao().queryBuilder()
+                .where(ComicChapterBeanDao.Properties.CacheState.eq(Constant.DownloadState.DOWNLOADING))
                 .list();
 
-        for (BookChapter chapter : chapters) {
+        for (ComicChapterBean chapter : chapters) {
             chapter.setCacheState(Constant.DownloadState.DOWNLOAD_CANCEL);
         }
-        mDaoSession.getBookChapterDao().updateInTx(chapters);
+        mDaoSession.getComicChapterBeanDao().updateInTx(chapters);
     }
 
     private void cancelAllChapterCache() {
-        List<BookChapter> chapters = mDaoSession.getBookChapterDao().queryRaw("where Cache_State = ?"
+        List<ComicChapterBean> chapters = mDaoSession.getComicChapterBeanDao().queryRaw("where Cache_State = ?"
                 , new String[]{String.valueOf(Constant.DownloadState.DOWNLOADING)});
         if (chapters.size() > 0) {
             for (int i = 0; i < chapters.size(); i++) {
                 chapters.get(i).setCacheState(Constant.DownloadState.DOWNLOAD_CANCEL);
             }
-            mDaoSession.getBookChapterDao().updateInTx(chapters);
+            mDaoSession.getComicChapterBeanDao().updateInTx(chapters);
         }
     }
 
     private DownloadTask startDownloadTask(long chapterId) {
-        BookChapter chapter = mDaoSession.getBookChapterDao().queryBuilder()
-                .where(BookChapterDao.Properties._id.eq(chapterId))
+        ComicChapterBean chapter = mDaoSession.getComicChapterBeanDao().queryBuilder()
+                .where(ComicChapterBeanDao.Properties._id.eq(chapterId))
                 .unique();
         return startDownloadTask(chapter);
     }
 
     //开启下载图片任务
-    private DownloadTask startDownloadTask(BookChapter chapter) {
+    private DownloadTask startDownloadTask(ComicChapterBean chapter) {
         DownloadTask task = new DownloadTask(DownloadService.this, mDaoSession, downLoadInterface);
         task.execute(chapter);
         return task;
@@ -326,7 +349,7 @@ public class DownloadService extends Service {
     }
 
     //发送下载进度广播
-    private void sendDownloadReceiver(BookChapter bean, boolean isFinish) {
+    private void sendDownloadReceiver(ComicChapterBean bean, boolean isFinish) {
         //设置间隔更新UI界面
         long currentTime = System.currentTimeMillis();
         if (currentTime - mLastUpdateTime < mUpdateTimeInterval && bean.getCacheCount() != bean.getMaxCount() &&
@@ -334,7 +357,7 @@ public class DownloadService extends Service {
         mLastUpdateTime = currentTime;
 
         if (mBook == null) {
-            mBook = mDaoSession.getBookShelfDao().queryBuilder().where(BookShelfDao.Properties._id.eq(bean.getBookId())).unique();
+            mBook = mDaoSession.getComicBookBeanDao().queryBuilder().where(ComicBookBeanDao.Properties._id.eq(bean.getBookId())).unique();
         }
 
         //发送广播
@@ -353,7 +376,7 @@ public class DownloadService extends Service {
         sendBroadcast(intent);
     }
 
-    private void sendDownloadReceiver(BookShelf book) {
+    private void sendDownloadReceiver(ComicBookBean book) {
         DownloadReceiver.ReceiverCancelBean receiverBean = new DownloadReceiver.ReceiverCancelBean();
         receiverBean.bookId = book.get_id();
         receiverBean.bookProgress = book.getProgress();
@@ -375,28 +398,29 @@ public class DownloadService extends Service {
         if (mLsTask.size() != 0) {
             if (mLsTask.containsValue(chapterId)) {
                 Log.e(TAG1, "cancelTask:  ok" + chapterId);
-                mLsTask.get(chapterId).cancel(true);
+                mLsTask.get(chapterId).cancelTask();
                 mLsTask.remove(chapterId);
             }
         }
     }
 
     //取消单个任务
-    public void cancelTask(BookChapter chapter, boolean hasPlayTask) {
+    public void cancelTask(ComicChapterBean chapter, boolean hasPlayTask) {
         Log.e(TAG1, "cancelTask1: " + chapter.get_id());
         long chapterId = chapter.get_id();
         if (mLsTask.size() != 0) {
             if (mLsTask.containsKey(chapterId)) {
                 Log.e(TAG1, "cancelTask1:  ok" + chapterId);
-                mLsTask.get(chapterId).cancel(true);
+                mLsTask.get(chapterId).cancelTask();
                 mLsTask.remove(chapterId);
             }
         }
-        BookShelf book = null;
+        ComicBookBean book = null;
         //保存书架表的缓存数据
         if (hasPlayTask)
-            book = updateBookShelf(chapter.getBookId(), Constant.DownloadState.DOWNLOADING);
-        else book = updateBookShelf(chapter.getBookId(), Constant.DownloadState.DOWNLOAD_CANCEL);
+            book = updateComicBookBean(chapter.getBookId(), Constant.DownloadState.DOWNLOADING);
+        else
+            book = updateComicBookBean(chapter.getBookId(), Constant.DownloadState.DOWNLOAD_CANCEL);
 
         sendDownloadReceiver(book);
     }
@@ -404,12 +428,12 @@ public class DownloadService extends Service {
     /**
      * 取消多个任务  一本书的所有运行的都取消
      */
-    public void cancelTask(List<BookChapter> chapters) {
+    public void cancelTask(List<ComicChapterBean> chapters) {
         if (mLsTask.size() == 0) return;
         if (chapters.size() == 0) return;
         Log.e(TAG1, "-----------------------cancelTask------>:  " + mLsTask.size());
         //取消多个任务
-        for (BookChapter chapter : chapters) {
+        for (ComicChapterBean chapter : chapters) {
             long chapterId = chapter.get_id();
             Log.e(TAG1, "cancelTask------>:  " + chapterId);
 
@@ -420,7 +444,7 @@ public class DownloadService extends Service {
             }
         }
         //更新book
-        BookShelf book = updateBookShelf(chapters.get(0).getBookId(), Constant.DownloadState.DOWNLOAD_CANCEL);
+        ComicBookBean book = updateComicBookBean(chapters.get(0).getBookId(), Constant.DownloadState.DOWNLOAD_CANCEL);
         //发送广播
         sendDownloadReceiver(book);
     }
@@ -428,8 +452,8 @@ public class DownloadService extends Service {
     /**
      * 取消漫画书的所有的任务
      */
-    public void cancelBookTask(BookShelf book) {
-        List<BookChapter> chapters = mDaoSession.getBookChapterDao()
+    public void cancelBookTask(ComicBookBean book) {
+        List<ComicChapterBean> chapters = mDaoSession.getComicChapterBeanDao()
                 .queryRaw("where Book_Id = ? and Cache_State = ?", new String[]{
                         String.valueOf(book.get_id()), String.valueOf(Constant.DownloadState.DOWNLOADING)
                 });
@@ -438,7 +462,7 @@ public class DownloadService extends Service {
         if (chapters.size() == 0) return;
 
         //将这本书的相关任务取消掉
-        for (BookChapter chapter : chapters) {
+        for (ComicChapterBean chapter : chapters) {
             long chapterId = chapter.get_id();
             chapter.setCacheState(Constant.DownloadState.DOWNLOAD_CANCEL);
             if (mLsTask.containsKey(chapterId)) {
@@ -447,9 +471,9 @@ public class DownloadService extends Service {
             }
         }
 
-        mDaoSession.getBookChapterDao().updateInTx(chapters);
+        mDaoSession.getComicChapterBeanDao().updateInTx(chapters);
         book.setCacheState(Constant.DownloadState.DOWNLOAD_CANCEL);
-        mDaoSession.getBookShelfDao().update(book);
+        mDaoSession.getComicBookBeanDao().update(book);
     }
 
 
@@ -459,11 +483,27 @@ public class DownloadService extends Service {
     public void cancelTask() {
         if (mLsTask.size() != 0) {
             for (Map.Entry<Long, DownloadTask> entity : mLsTask.entrySet()) {
-                entity.getValue().cancel(true);
+                entity.getValue().cancelTask();
             }
             mLsTask = new LinkedHashMap<>();
         }
         updateChapterCacheState();
+        updateBookState2Cancel();
+    }
+
+    private void updateBookState2Cancel() {
+        StringBuffer sql = new StringBuffer();
+        sql.append("update  comic_book_bean set cache_state = %1$d  where _id in (");
+        sql.append("select  A.book_id  from  (");
+        sql.append("(select  book_id, count(*) as cancelCount  from comic_chapter_bean where cache_state = %2$d group by book_id ) as  A  ");
+        sql.append(" left join ");
+        sql.append("(select  book_id, count(*) as runCount  from comic_chapter_bean where cache_state = %3$d group by book_id  ) as B ");
+        sql.append(" on A.book_id=B.book_id ) as C ");
+        sql.append(" where cancelCount  > 0 and runCount is null );");
+
+        String sqlStr = String.format(sql.toString(), Constant.DownloadState.DOWNLOAD_CANCEL, Constant.DownloadState.DOWNLOAD_CANCEL,
+                Constant.DownloadState.DOWNLOADING);
+        mDaoSession.getDatabase().execSQL(sqlStr);
     }
 
     /**
@@ -472,15 +512,15 @@ public class DownloadService extends Service {
      * @param chapterId
      */
     public void addTask(long chapterId, long bookId) {
-        QueryBuilder<ChapterDetail> builder = mDaoSession.getChapterDetailDao().queryBuilder()
-                .where(ChapterDetailDao.Properties.ChapterId.eq(chapterId));
+        QueryBuilder<ComicImageBean> builder = mDaoSession.getComicImageBeanDao().queryBuilder()
+                .where(ComicImageBeanDao.Properties.ChapterId.eq(chapterId));
 
         long maxCount = builder.count();
-        long cacheCount = builder.where(ChapterDetailDao.Properties.IsCaching.eq(true)).count();
+        long cacheCount = builder.where(ComicImageBeanDao.Properties.IsCaching.eq(true)).count();
         //数据已经下载完了 界面未更新
         if (maxCount > 0 && maxCount == cacheCount) {
-            BookChapter chapter = mDaoSession.getBookChapterDao().queryBuilder()
-                    .where(BookChapterDao.Properties._id.eq(chapterId))
+            ComicChapterBean chapter = mDaoSession.getComicChapterBeanDao().queryBuilder()
+                    .where(ComicChapterBeanDao.Properties._id.eq(chapterId))
                     .unique();
             chapter.setCacheCount((int) cacheCount);
             updateChapterCacheProgress(chapter);
@@ -493,101 +533,85 @@ public class DownloadService extends Service {
         if (mLsTask.size() <= 1) {
             mLsTask.put(chapterId, startDownloadTask(chapterId));
             mBook = updateBookCacheProgress(bookId);
-            sendDownloadReceiver(mBook);
+//            sendDownloadReceiver(mBook);
             return;
         }
 
-        //任务已经存在
-        if (mLsTask.containsValue(chapterId)) {
-            DownloadTask task = mLsTask.get(chapterId);
-            if (task != null) {
-                task.execute(task.getBookChapter());
-            }
-        }
-        //任务不存在 需要插入到任务中
-        else {
-            Object[] objects = mLsTask.keySet().toArray();
-            List<Long> values = new ArrayList<>();  //记录在原始任务中 插入b任务之后的任务集
-            long startKey = -1;  //原始数据 a c d f两个任务，插入 b任务   startKey指的是a的位置
-            for (int i = 0; i < objects.length; i++) {
-                //加入到最后一个
-                if (i == objects.length - 1) {
-                    mLsTask.put(chapterId, startDownloadTask(chapterId));
-                    return;
-                }
-                long currentKey = (long) objects[i];
-                //已经记录了要插入的数据
-                if (startKey > 0) {
-                    //任务没有被取消
-                    if (!mLsTask.get(currentKey).isCancelled()) {
-                        //先将任务取消
-                        mLsTask.get(currentKey).cancel(true);
-                        values.add(currentKey);
-
-                        mLsTask.remove(currentKey);
-                    }
-                    continue;
-                }
-                //找到需要插入的地方
-                if (currentKey < chapterId && chapterId < (long) objects[i + 1]) {
-                    startKey = currentKey;
-                }
-            }
-
-            //在重新开启 插入b任务之后的未取消的任务
-            mLsTask.put(chapterId, startDownloadTask(chapterId));
-            for (Long value : values) {
-                mLsTask.put(value, startDownloadTask(value));
-            }
-        }
-
-        mBook = updateBookCacheProgress(bookId);
-        sendDownloadReceiver(mBook);
+        addMoreTask(bookId);
     }
 
 
-    /**
-     * 添加多个下载任务
-     */
-    public void addMoreTask() {
-        Log.e(TAG1, "addMoreTask: ");
-        //取消第一个任务的之外的任务
+    //终极下载任务
+    public void addMoreTask(Long bookId) {
+        if (bookId == null) return;
+
+        LinkedHashMap<Long, DownloadTask> lsBefore = new LinkedHashMap<>(); //这本书之前的任务，如果第一个任务就是这本书  那么保留第一个
+        List<Long> lsAfter = new ArrayList<>();  //这本书之后的任务
+
+        //针对有多个数据的任务 需要进行重新分段
         if (mLsTask.size() > 1) {
-            long chapterId = 0;
-            DownloadTask task = null;
-            int i = 0;
+            String sql = "select max(_id) as max,min(_id) as min from Comic_Chapter_Bean where book_id = ?";
+            Cursor cursor = mDaoSession.getDatabase().rawQuery(sql, new String[]{String.valueOf(bookId)});
+
+            cursor.moveToFirst();
+            long maxId = cursor.getLong(0);  //这本书最大ChapterId
+            long minId = cursor.getLong(1);  //这本书最小ChapterId
+
+            boolean isHandle = false;  //记录是否遇到了这本书的章节
+            int x = 0;
+            //循环整个任务集
             for (Map.Entry<Long, DownloadTask> entity : mLsTask.entrySet()) {
-                if (i == 0) {
-                    Log.e(TAG1, "addMoreTask--->cancel " + entity.getKey());
-                    chapterId = entity.getKey();
-                    task = entity.getValue();
-
+                long key = entity.getKey();
+                DownloadTask value = entity.getValue();
+                //这本书的章节 对其任务进行取消
+                if (minId <= key && key <= maxId) {
+                    isHandle = true;
+                    if (x == 0) lsBefore.put(key, value);
+                    else
+                        value.cancelTask();
                 } else {
-                    entity.getValue().cancel(true);
+                    //对这本书之后的章节进行取消  并且保存下来
+                    if (isHandle) {
+                        value.cancelTask();
+                        lsAfter.add(key);
+                    } else {
+                        //保留未遇到这本书之前的任务
+                        lsBefore.put(key, value);
+                    }
                 }
-                i++;
+                x++;
             }
-            mLsTask.clear();
-            mLsTask.put(chapterId, task);
-        }
 
-        List<BookChapter> chapters = mDaoSession.getBookChapterDao().queryBuilder()
-                .where(BookChapterDao.Properties.CacheState.eq(Constant.DownloadState.DOWNLOADING))
+            mLsTask.clear();
+        }
+        //这本书全部的需要下载的章节  按照id进行下载排列
+        List<ComicChapterBean> list = mDaoSession.getComicChapterBeanDao().queryBuilder()
+                .where(ComicChapterBeanDao.Properties.BookId.eq(bookId),
+                        ComicChapterBeanDao.Properties.CacheState.eq(Constant.DownloadState.DOWNLOADING))
                 .list();
 
-        Log.e(TAG1, "addMoreTask: lsTask:size" + mLsTask.size());
-
-        for (int j = 0; j < chapters.size(); j++) {
-            long chapterId = chapters.get(j).get_id();
-            Log.e(TAG1, "addMoreTask--->put new " + chapterId);
-            if (mLsTask.containsKey(chapterId)) continue;
-            mLsTask.put(chapterId, startDownloadTask(chapterId));
+        //加入这本书的章节
+        for (int i = 0; i < list.size(); i++) {
+            if (!lsBefore.containsKey(list.get(i).get_id()))
+                lsBefore.put(list.get(i).get_id(), startDownloadTask(list.get(i)));
         }
+        //加入这本书之后的章节
+        for (int i = 0; i < lsAfter.size(); i++) {
+            lsBefore.put(lsAfter.get(i), startDownloadTask(lsAfter.get(i)));
+        }
+
+        mLsTask = lsBefore;
+
+        //更新book
+        ComicBookBean book = updateComicBookBean(bookId, Constant.DownloadState.DOWNLOADING);
+        //发送广播
+        sendDownloadReceiver(book);
     }
 
-    public void addBookTask(long bookId) {
+    //针对这本书中已取消的任务
+    public void addMoreCanceledTask(long bookId) {
         //更新章节表的状态   取消--->正在下载
-        List<BookChapter> chapters = mDaoSession.getBookChapterDao()
+        List<ComicChapterBean> chapters = mDaoSession.getComicChapterBeanDao()
                 .queryRaw("where Book_Id = ? and Cache_State = ? ",
                         new String[]{String.valueOf(bookId),
                                 String.valueOf(Constant.DownloadState.DOWNLOAD_CANCEL)});
@@ -595,21 +619,16 @@ public class DownloadService extends Service {
             chapters.get(i).setCacheState(Constant.DownloadState.DOWNLOADING);
         }
 
-        mDaoSession.getBookChapterDao().updateInTx(chapters);
+        mDaoSession.getComicChapterBeanDao().updateInTx(chapters);
 
         //更新漫画书表的状态  取消--->正在下载
-        BookShelf book = mDaoSession.getBookShelfDao().queryBuilder()
-                .where(BookShelfDao.Properties._id.eq(bookId))
+        ComicBookBean book = mDaoSession.getComicBookBeanDao().queryBuilder()
+                .where(ComicBookBeanDao.Properties._id.eq(bookId))
                 .unique();
         book.setCacheState(Constant.DownloadState.DOWNLOADING);
-        mDaoSession.getBookShelfDao().update(book);
+        mDaoSession.getComicBookBeanDao().update(book);
 
-        //将取消状态的任务重新开启
-        for (int i = 0; i < chapters.size(); i++) {
-            DownloadTask task = startDownloadTask(chapters.get(i));
-            mLsTask.put(chapters.get(i).get_id(), task);
-        }
-
+        addMoreTask(bookId);
     }
 
     private void delTask(long chapterId) {

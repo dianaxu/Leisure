@@ -125,8 +125,7 @@ public class VideoFragment extends Fragment implements CacheListener {
     }
 
     private void setCachedState(boolean cached) {
-        int statusIconId = cached ? R.drawable.ic_cloud_done : R.drawable.ic_cloud_download;
-        cacheStatusImageView.setImageResource(statusIconId);
+//        cacheStatusImageView.setImageResource(statusIconId);
     }
 
 

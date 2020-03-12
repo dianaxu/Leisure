@@ -13,8 +13,8 @@ import android.widget.Toast;
 import com.danikula.videocache.HttpProxyCacheServer;
 import com.example.leisure.MainApplication;
 import com.example.leisure.R;
-import com.example.leisure.adapter.BaseRecyclerViewAdapter;
-import com.example.leisure.adapter.MusicChannelDetailsAdapter;
+import com.example.leisure.activity.adapter.BaseRecyclerViewAdapter;
+import com.example.leisure.activity.adapter.MusicChannelDetailsAdapter;
 import com.example.leisure.bean.MusicBroadcastingDetailsBean;
 import com.example.leisure.glide.ImageLoader;
 import com.example.leisure.retrofit.MyObserver;
@@ -133,9 +133,9 @@ public class MusicChannelDetailsActivity extends AppCompatActivity implements Vi
         mAdapter = new MusicChannelDetailsAdapter(MusicChannelDetailsActivity.this, mLsData);
         mRvView.setAdapter(mAdapter);
 
-        mAdapter.addOnRecyclerViewItemClickListener(new BaseRecyclerViewAdapter.OnRecyclerViewItemClickListener<MusicBroadcastingDetailsBean.SonglistBean>() {
+        mAdapter.setOnItemClickListener(new BaseRecyclerViewAdapter.OnItemClickListener<MusicBroadcastingDetailsBean.SonglistBean>() {
             @Override
-            public void onRecyclerViewItemClick(View view, int position, MusicBroadcastingDetailsBean.SonglistBean bean) {
+            public void onItemClick(View view, int position, MusicBroadcastingDetailsBean.SonglistBean bean) {
                 //启动后台播放，播放单个视频，跳转到详情页
                 MusicDetailsActivity.startMusicDetailsActivity(MusicChannelDetailsActivity.this, bean.songid);
             }

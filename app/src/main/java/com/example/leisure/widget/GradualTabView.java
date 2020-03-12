@@ -19,8 +19,8 @@ import androidx.annotation.Nullable;
  */
 public class GradualTabView extends FrameLayout {
 
-    private static final int ICON_DEFAULT = android.R.drawable.ic_menu_myplaces;
-    private static final int ICON_SELECT_DEFAULT = android.R.drawable.ic_menu_myplaces;
+    private static final int ICON_DEFAULT = R.drawable.ic_home;
+    private static final int ICON_SELECT_DEFAULT = R.drawable.ic_home_s;
     private static final int TEXT_START_COLOR_DEFAULT = Color.parseColor("#8E8E8E");
     private static final int TEXT_END_COLOR_DEFAULT = Color.BLACK;
 
@@ -54,7 +54,7 @@ public class GradualTabView extends FrameLayout {
         typedArray.recycle();
 
         mIvIcon = this.findViewById(R.id.iv_icon);
-        mIvIconSelect = this.findViewById(R.id.iv_icon_select);
+//        mIvIconSelect = this.findViewById(R.id.iv_icon_select);
         mTvTitle = this.findViewById(R.id.tv_title);
 
         setIconAndText(iconResId, iconSelectedResId, text);
@@ -67,13 +67,14 @@ public class GradualTabView extends FrameLayout {
     //方法二直接对外开放方法设置
     public void setIconAndText(int icon, int iconSelect, String title) {
         mIvIcon.setImageResource(icon);
-        mIvIconSelect.setImageResource(iconSelect);
+//        mIvIconSelect.setImageResource(iconSelect);
         mTvTitle.setText(title);
     }
 
     public void setProgress(float progress) {
-        mIvIcon.setAlpha(1 - progress);
-        mIvIconSelect.setAlpha(progress);
+        mIvIcon.setSelected(progress == 1);
+//        mIvIcon.setAlpha(1 - progress);
+//        mIvIconSelect.setAlpha(progress);
         mTvTitle.setTextColor((Integer) evaluate(progress, mTextStartColorResId, mTextEndColorResId));
     }
 

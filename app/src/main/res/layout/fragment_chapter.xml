@@ -11,7 +11,9 @@
         android:id="@+id/ctb_header"
         android:layout_width="match_parent"
         android:layout_height="@dimen/tabbarH"
-        app:toolbar_left_drawable="@drawable/selector_back" />
+        app:toolbar_left_drawable="@drawable/selector_back"
+        app:toolbar_right_text="正序"
+        app:toolbar_text_color="@color/textTitleColor" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_view"

@@ -11,6 +11,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
         release {
@@ -22,7 +23,12 @@ android {
         targetCompatibility 1.8
         sourceCompatibility 1.8
     }
+
+
+    aaptOptions.cruncherEnabled = false
+    aaptOptions.useNewCruncher = false
 }
+
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
@@ -34,10 +40,6 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:+'
     'android.support.design.widget.NavigationView'
     implementation files('F:/githubtest/Leisure/libs/nineoldandroids-2.4.0.jar')
-    //    implementation 'com.squareup.retrofit2:retrofit:2.0.2'
-    //    implementation 'com.squareup.okhttp3:okhttp:3.1.2'
-    //    implementation 'com.squareup.retrofit2:converter-gson:2.0.2'
-    //    implementation 'com.squareup.retrofit2:adapter-rxjava:2.0.2'
     //retrofit网络请求框架
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
     //retrofit添加Json解析返回数据

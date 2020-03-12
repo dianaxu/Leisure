@@ -3,10 +3,9 @@
     android:id="@+id/ll_search"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/shap_search"
-    android:orientation="horizontal"
-    android:paddingLeft="@dimen/margin"
-    android:paddingRight="@dimen/margin">
+    android:layout_margin="@dimen/imagePadding"
+    android:padding="4dp"
+    android:background="@drawable/shap_search">
 
 
     <ImageView
@@ -14,17 +13,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:src="@mipmap/ic_search" />
+        android:layout_marginLeft="4dp"
+        android:src="@drawable/ic_search" />
 
     <EditText
         android:id="@+id/et_search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/imagePadding"
+        android:layout_marginLeft="4dp"
+        android:background="@null"
         android:hint="搜索漫画名"
         android:imeOptions="actionSearch"
         android:inputType="text"
-        android:maxLines="1" />
+        android:maxLines="1"
+        android:textSize="16sp" />
 
 
 </LinearLayout>

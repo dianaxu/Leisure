@@ -2,102 +2,94 @@ package com.example.leisure.db.greendao;
 
 import android.content.Context;
 
-import com.example.leisure.BuildConfig;
 import com.example.leisure.greenDao.gen.DaoMaster;
 import com.example.leisure.greenDao.gen.DaoSession;
 
 import org.greenrobot.greendao.query.QueryBuilder;
 
-/**
- * 创建数据库、创建数据库表、包含增删改查的操作以及数据库的升级
- */
-
 public class DaoManager {
-    private static final String TAG = DaoManager.class.getSimpleName();
-    private static final String DB_NAME = "greendaotest";
-
+    private static final String DB_NAME = "greendaotest";//数据库名称
+    private static DaoManager mDaoManager;
+    private DaoMaster.DevOpenHelper mHelper;
+    private DaoMaster mDaoMaster;
+    private DaoSession mDaoSession;
     private Context context;
-
-    //多线程中要被共享的使用volatile关键字修饰
-    private volatile static DaoManager manager = new DaoManager();
-    private static DaoMaster sDaoMaster;
-    private static DaoMaster.DevOpenHelper sHelper;
-    private static DaoSession sDaoSession;
-
-    /**
-     * 单例模式获得操作数据库对象
-     *
-     * @return
-     */
-    public static DaoManager getInstance() {
-        return manager;
-    }
-
-    private DaoManager() {
-        setDebug();
-    }
-
-    public void init(Context context) {
+    public DaoManager(Context context) {
         this.context = context;
     }
 
     /**
-     * 判断是否有存在数据库，如果没有则创建
+     * 使用单例模式获得操作数据库的对象
      *
      * @return
      */
-    public DaoMaster getDaoMaster() {
-        if (sDaoMaster == null) {
-            DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(context, DB_NAME, null);
-            sDaoMaster = new DaoMaster(helper.getWritableDatabase());
-        }
-        return sDaoMaster;
-    }
-
-    /**
-     * 完成对数据库的添加、删除、修改、查询操作，仅仅是一个接口
-     *
-     * @return
-     */
-    public DaoSession getDaoSession() {
-        if (sDaoSession == null) {
-            if (sDaoMaster == null) {
-                sDaoMaster = getDaoMaster();
+    public static DaoManager getInstance(Context context) {
+        if (mDaoManager == null) {
+            synchronized (DaoManager.class) {
+                if (mDaoManager == null) {
+                    mDaoManager = new DaoManager(context);
+                }
             }
-            sDaoSession = sDaoMaster.newSession();
         }
-        return sDaoSession;
+        return mDaoManager;
     }
 
     /**
-     * 打开输出日志，默认关闭
+     * 获取DaoSession
+     *
+     * @return
      */
-    public void setDebug() {
-        if (BuildConfig.DEBUG) {
-            QueryBuilder.LOG_SQL = true;
-            QueryBuilder.LOG_VALUES = true;
+    public synchronized DaoSession getDaoSession() {
+        if (null == mDaoSession) {
+            mDaoSession = getDaoMaster().newSession();
         }
+        return mDaoSession;
     }
 
     /**
-     * 关闭所有的操作，数据库开启后，使用完毕要关闭
+     * 设置debug模式开启或关闭，默认关闭
+     *
+     * @param flag
      */
-    public void closeConnection() {
+    public  void setDebug(boolean flag) {
+        QueryBuilder.LOG_SQL = flag;
+        QueryBuilder.LOG_VALUES = flag;
+    }
+
+
+
+    /**
+     * 关闭数据库
+     */
+    public synchronized void closeDataBase() {
         closeHelper();
         closeDaoSession();
     }
 
-    public void closeHelper() {
-        if (sHelper != null) {
-            sHelper.close();
-            sHelper = null;
+    /**
+     * 判断数据库是否存在，如果不存在则创建
+     *
+     * @return
+     */
+    private DaoMaster getDaoMaster() {
+        if (null == mDaoMaster) {
+            mHelper = new DaoMaster.DevOpenHelper(context, DB_NAME, null);
+            mDaoMaster = new DaoMaster(mHelper.getWritableDb());
+        }
+        return mDaoMaster;
+    }
+
+    private void closeDaoSession() {
+        if (null != mDaoSession) {
+            mDaoSession.clear();
+            mDaoSession = null;
         }
     }
 
-    public void closeDaoSession() {
-        if (sDaoSession != null) {
-            sDaoSession.clear();
-            sDaoSession = null;
+    private void closeHelper() {
+        if (mHelper != null) {
+            mHelper.close();
+            mHelper = null;
         }
     }
 }

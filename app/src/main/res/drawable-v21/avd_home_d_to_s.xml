@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:drawable="@drawable/home"
+ >
+
+    <!--    颜色-->
+    <target android:name="home">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator
+                    android:duration="100"
+                    android:propertyName="fillColor"
+                    android:valueFrom="@color/tabTextStartColor"
+                    android:valueTo="@color/textTitleColor"
+                    android:valueType="colorType" />
+            </set>
+        </aapt:attr>
+    </target>
+
+    <target android:name="home_rect">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator
+                    android:duration="100"
+                    android:propertyName="fillColor"
+                    android:valueFrom="@color/tabTextStartColor"
+                    android:valueTo="@color/home_light"
+                    android:valueType="colorType" />
+            </set>
+        </aapt:attr>
+    </target>
+
+    <!--    缩放-->
+    <target android:name="g_home_rect">
+        <aapt:attr name="android:animation">
+            <set>
+                <!--  从0放大到1  -->
+                <objectAnimator
+                    android:duration="300"
+                    android:interpolator="@android:interpolator/decelerate_cubic"
+                    android:propertyName="scaleY"
+                    android:startOffset="200"
+                    android:valueFrom="0.0"
+                    android:valueTo="1.0"
+                    android:valueType="floatType" />
+
+                <objectAnimator
+                    android:duration="300"
+                    android:interpolator="@android:interpolator/decelerate_cubic"
+                    android:propertyName="scaleX"
+                    android:startOffset="200"
+                    android:valueFrom="0.0"
+                    android:valueTo="1.0"
+                    android:valueType="floatType" />
+            </set>
+        </aapt:attr>
+    </target>
+
+    <!--    home 移动 + 收缩-->
+    <target android:name="g_home">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator
+                    android:duration="200"
+                    android:interpolator="@android:interpolator/decelerate_cubic"
+                    android:propertyName="translateY"
+                    android:valueFrom="200"
+                    android:valueTo="0"
+                    android:valueType="floatType" />
+
+                <objectAnimator
+                    android:duration="1000"
+                    android:interpolator="@android:interpolator/bounce"
+                    android:propertyName="scaleY"
+                    android:valueFrom="0.6"
+                    android:valueTo="1.0"
+                    android:valueType="floatType" />
+            </set>
+        </aapt:attr>
+    </target>
+
+
+</animated-vector>

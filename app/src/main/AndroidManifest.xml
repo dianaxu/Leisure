@@ -31,16 +31,17 @@
         <activity
             android:name=".activity.ComicContentActivity"
             android:theme="@style/MyTheme" />
-        <activity android:name=".activity.WYNewsDetailsActivity" />
+<!--        <activity android:name=".activity.WYNewsDetailsActivity" />-->
         <activity android:name=".activity.JokeDetailsActivity" />
         <activity android:name=".activity.MusicDetailsActivity" />
         <activity android:name=".activity.MusicChannelDetailsActivity" />
         <activity android:name=".activity.LogonActivity" />
         <activity android:name=".activity.FindPwdActivity" />
         <activity android:name=".activity.LogonDevelopActivity" />
-        <activity android:name=".activity.MainActivity" />
+<!--        <activity android:name=".activity.MainActivity" />-->
         <activity android:name=".activity.DownloadComicActivity" />
-        <activity android:name=".activity.LoginActivity">
+<!--        <activity android:name=".activity.LoginActivity">-->
+        <activity android:name=".activity.MainActivity">
 
             <!--        <activity android:name=".test.Test1ServiceActivity">-->
             <intent-filter>

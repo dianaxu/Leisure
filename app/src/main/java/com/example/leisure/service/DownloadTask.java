@@ -7,12 +7,14 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.example.leisure.bean.ComicContentBean;
-import com.example.leisure.db.greendao.BookChapter;
-import com.example.leisure.db.greendao.ChapterDetail;
-import com.example.leisure.greenDao.gen.ChapterDetailDao;
+import com.example.leisure.db.greendao.ComicChapterBean;
+import com.example.leisure.db.greendao.ComicImageBean;
+import com.example.leisure.greenDao.gen.ComicImageBeanDao;
 import com.example.leisure.greenDao.gen.DaoSession;
+import com.example.leisure.retrofit.RxExceptionUtil;
 import com.example.leisure.util.FileUtil;
 import com.example.leisure.util.InputStreamUtil;
+import com.example.leisure.util.NetworkUtil;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -24,34 +26,35 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class DownloadTask extends AsyncTask<Object, ChapterDetail, BookChapter> {
+public class DownloadTask extends AsyncTask<Object, ComicImageBean, ComicChapterBean> {
     private static final String BASE_URL = "http://api.pingcc.cn/?mhurl2=";
     private static final String TAG = "DownloadTask";
 
     private Context mContext;
-    private BookChapter mChapter;
+    private ComicChapterBean mChapter;
     private DaoSession mDaoSession;
 
     private onDownLoadInterface mInterface;
     private boolean mIsCancel = false;
+    private boolean mIsConnectionWifi = true;
 
     public void cancelTask() {
         mIsCancel = true;
         this.cancel(true);
     }
 
-    public BookChapter getBookChapter() {
+    public ComicChapterBean getComicChapterBean() {
         return mChapter;
     }
 
     public interface onDownLoadInterface {
         void onStarting(long chapterId);
 
-        void onProgressUpdate(BookChapter bean, ChapterDetail detail);
+        void onProgressUpdate(ComicChapterBean bean, ComicImageBean detail);
 
-        void onFinish(BookChapter bean);
+        void onFinish(ComicChapterBean bean);
 
-        void onFail(long chapterId);
+        void onFail(long chapterId, boolean isConnWifi);
     }
 
     public DownloadTask(Context context, DaoSession daoSession, onDownLoadInterface face) {
@@ -67,28 +70,25 @@ public class DownloadTask extends AsyncTask<Object, ChapterDetail, BookChapter> 
     }
 
     @Override
-    protected BookChapter doInBackground(Object... details) {
-        mChapter = (BookChapter) details[0];
+    protected ComicChapterBean doInBackground(Object... details) {
+        mChapter = (ComicChapterBean) details[0];
         long chapterId = mChapter.get_id();
-        Log.e(TAG, chapterId + "doInBackground--->mIsCancel" + mIsCancel);
         if (mIsCancel) {
-            Log.e(TAG, chapterId + "doInBackground--->canceled");
             return mChapter;
         }
 
-        List<ChapterDetail> lsImg = mChapter.getMLsChapterImage();
+        List<ComicImageBean> lsImg = mChapter.getList();
 
-        Log.e(TAG, chapterId + "  doInBackground  " + mChapter.getCacheCount() + ":" + mChapter.getMaxCount());
 
         if (lsImg.size() == 0) {
             if (mChapter.getMaxCount() > 0)
-                lsImg = mDaoSession.getChapterDetailDao().queryRaw("where Chapter_Id = ?", new String[]{String.valueOf(chapterId)});
+                lsImg = mDaoSession.getComicImageBeanDao().queryRaw("where Chapter_Id = ?", new String[]{String.valueOf(chapterId)});
             else
                 lsImg = getComicContent();
         }
         //没有图片集
         if (lsImg == null) {
-            mInterface.onFail(chapterId);
+            mInterface.onFail(chapterId, mIsConnectionWifi);
             return mChapter;
         }
 
@@ -97,13 +97,13 @@ public class DownloadTask extends AsyncTask<Object, ChapterDetail, BookChapter> 
         mChapter.setMaxCount(length);
         mChapter.setCacheCount(0);
         for (int i = 0; i < length; i++) {
-            Log.e(TAG, chapterId + "-------doInBackground-------->" + mIsCancel);
+            if (!checkNetworkWifi()) return mChapter;
             //任务中途被取消
             if (mIsCancel) {
-                Log.e(TAG, chapterId + "doInBackground--->canceled" + i);
                 return mChapter;
             }
-            ChapterDetail bean = lsImg.get(i);
+
+            ComicImageBean bean = lsImg.get(i);
             //图片存在，但是数据库
             // 没有缓存
             if (bean.getIsCaching()) {
@@ -126,18 +126,29 @@ public class DownloadTask extends AsyncTask<Object, ChapterDetail, BookChapter> 
         return mChapter;
     }
 
+    private boolean checkNetworkWifi() {
+        if (!NetworkUtil.isConnectedByWifi(mContext)) {
+            //将所有的任务全部停止
+            return mIsConnectionWifi = false;
+        }
+        return mIsConnectionWifi = true;
+    }
+
+
     //进度更新
     @Override
-    protected void onProgressUpdate(ChapterDetail... values) {
+    protected void onProgressUpdate(ComicImageBean... values) {
         super.onProgressUpdate(values);
-        Log.e(TAG, "----------------onProgressUpdate: ");
         mInterface.onProgressUpdate(mChapter, values[0]);
     }
 
     @Override
-    protected void onPostExecute(BookChapter chapter) {
+    protected void onPostExecute(ComicChapterBean chapter) {
         super.onPostExecute(chapter);
-        mInterface.onFinish(chapter);
+        if (!mIsConnectionWifi) {
+            mInterface.onFail(chapter.get_id(), mIsConnectionWifi);
+        } else
+            mInterface.onFinish(chapter);
     }
 
     private String downloadImage(String imgUrl) {
@@ -156,7 +167,7 @@ public class DownloadTask extends AsyncTask<Object, ChapterDetail, BookChapter> 
         InputStream inputStream;
         try {
             connection = (HttpURLConnection) new URL(imgUrl).openConnection(); // 打开一个连接
-//                    connection.setConnectTimeout(5000);   // 设置连接时长
+            connection.setConnectTimeout(3000);   // 设置连接时长
             if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                 inputStream = connection.getInputStream();
                 bitmap = BitmapFactory.decodeStream(inputStream);
@@ -167,8 +178,10 @@ public class DownloadTask extends AsyncTask<Object, ChapterDetail, BookChapter> 
                 return savePath;
             }
         } catch (MalformedURLException e) {
+            String msg = RxExceptionUtil.exceptionHandler(e);
             e.printStackTrace();
         } catch (IOException e) {
+            String msg = RxExceptionUtil.exceptionHandler(e);
             e.printStackTrace();
         }
         return null;
@@ -177,7 +190,11 @@ public class DownloadTask extends AsyncTask<Object, ChapterDetail, BookChapter> 
     /**
      * 获取章节下的漫画图片集  通过网络
      */
-    private List<ChapterDetail> getComicContent() {
+    private List<ComicImageBean> getComicContent() {
+        if (!checkNetworkWifi()) {
+            return null;
+        }
+
         String url = BASE_URL + mChapter.getUrl();
         HttpURLConnection connection;
         InputStream inputStream;
@@ -197,14 +214,14 @@ public class DownloadTask extends AsyncTask<Object, ChapterDetail, BookChapter> 
                     //保存图片链接
                     saveImageUrlsToDB(comicContentBean.list, mChapter.getBookId(), mChapter.get_id());
 
-                    List<ChapterDetail> lsDetail = mDaoSession.getChapterDetailDao().queryBuilder()
-                            .where(ChapterDetailDao.Properties.ChapterId.eq(mChapter.get_id()))
+                    List<ComicImageBean> lsDetail = mDaoSession.getComicImageBeanDao().queryBuilder()
+                            .where(ComicImageBeanDao.Properties.ChapterId.eq(mChapter.get_id()))
                             .list();
 
                     return lsDetail;
                 }
             } else {
-                mInterface.onFail(mChapter.get_id());
+                mInterface.onFail(mChapter.get_id(), mIsConnectionWifi);
             }
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -215,17 +232,17 @@ public class DownloadTask extends AsyncTask<Object, ChapterDetail, BookChapter> 
     }
 
     //保存图片路径到本地数据库
-    private void saveImageUrlsToDB(List<ComicContentBean.ListBean> list, Long bookId, Long
+    private void saveImageUrlsToDB(List<ComicImageBean> list, Long bookId, Long
             chapterId) {
-        List<ChapterDetail> detailList = new ArrayList<>();
+        List<ComicImageBean> detailList = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
-            ChapterDetail bean = new ChapterDetail();
+            ComicImageBean bean = new ComicImageBean();
             bean.setChapterId(chapterId);
-            bean.setImg(list.get(i).img);
+            bean.setImg(list.get(i).getImg());
             bean.setBookId(bookId);
             detailList.add(bean);
         }
-        mDaoSession.getChapterDetailDao().insertInTx(detailList);
+        mDaoSession.getComicImageBeanDao().insertInTx(detailList);
     }
 
     /**
