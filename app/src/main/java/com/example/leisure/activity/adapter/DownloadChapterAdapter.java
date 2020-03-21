@@ -175,7 +175,14 @@ public class DownloadChapterAdapter extends BaseRecyclerViewAdapter<ComicChapter
         return position;
     }
 
-    public void updateState(int position, int state) {
+    public void updateState(long chapterId, int position, int state) {
+        if (state == Constant.DownloadState.DOWNLOAD_CANCEL) {
+            mLsPlause.add(chapterId);
+            mLsPlay.remove(chapterId);
+        } else if (state == Constant.DownloadState.DOWNLOADING) {
+            mLsPlay.add(chapterId);
+            mLsPlause.remove(chapterId);
+        }
         mLsData.get(position).setCacheState(state);
         notifyItemChanged(position, UPDATE_ITEM_STATE);
     }

@@ -73,6 +73,10 @@ public class ScreenInfoUtils {
         return activity.getWindowManager().getDefaultDisplay().getWidth();
     }
 
+    public static int getWindoeWidth(Context context) {
+        return context.getResources().getDisplayMetrics().widthPixels;
+    }
+
     /**
      * 获取屏幕高度(全面屏手机获取高度有问题)
      *

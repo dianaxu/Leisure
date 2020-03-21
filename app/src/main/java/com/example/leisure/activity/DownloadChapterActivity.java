@@ -64,8 +64,6 @@ public class DownloadChapterActivity extends BaseActivity implements View.OnClic
     private ComicBookBean mBook;
     private DownloadService mService;
     private ServiceConnection mConn;
-    //    private boolean mIsConn;
-//    private ServiceConnection mServiceConn;
     private String TAG = "DownloadTask";
     private boolean isFront;
     private boolean hasStopService = false;
@@ -369,8 +367,9 @@ public class DownloadChapterActivity extends BaseActivity implements View.OnClic
             mLsData.remove(position);
             mAdapter.notifyItemRemoved(position);
         } else {
-            mAdapter.updateState(position, status);
+            mAdapter.updateState(chapterId,position, status);
         }
+        updateButtonText(mAdapter.hasPauseTask());
     }
 
     @Override

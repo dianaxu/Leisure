@@ -48,12 +48,8 @@ public class Constant {
         public static final int CANCEL = 4;   //取消
     }
 
-    public class SortType {
-        public static final int DOWN = 0;
-        public static final int UP = 1;
+    public class DownServiceState {
+        public static final String DOWNSERVICE_SELF_STOP="downservice_self_stop";
     }
 
-    public class ReceiverAction {
-        public static final String ACTION_DOWNLOAD = "com.example.leisure.DownloadReceiver";
-    }
 }

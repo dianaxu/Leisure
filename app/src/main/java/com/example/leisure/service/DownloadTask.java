@@ -3,6 +3,7 @@ package com.example.leisure.service;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -15,8 +16,10 @@ import com.example.leisure.retrofit.RxExceptionUtil;
 import com.example.leisure.util.FileUtil;
 import com.example.leisure.util.InputStreamUtil;
 import com.example.leisure.util.NetworkUtil;
+import com.example.leisure.util.ScreenInfoUtils;
 import com.google.gson.Gson;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -71,6 +74,7 @@ public class DownloadTask extends AsyncTask<Object, ComicImageBean, ComicChapter
         this.mDaoSession = daoSession;
         this.mBookId = bookId;
         this.mInterface = face;
+        this.mPxWidth = ScreenInfoUtils.getWindoeWidth(context);
     }
 
     //任务开始
@@ -220,18 +224,38 @@ public class DownloadTask extends AsyncTask<Object, ComicImageBean, ComicChapter
         try {
             connection = (HttpURLConnection) new URL(imgUrl).openConnection(); // 打开一个连接
             connection.setConnectTimeout(3000);   // 设置连接时长
-            connection.setReadTimeout(300);
             if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
                 inputStream = connection.getInputStream();
-                bitmap = BitmapFactory.decodeStream(inputStream);
-                inputStream.close();
-                //保存图片到本地
+                if (inputStream == null) {
+                    throw new RuntimeException("stream is null");
+                } else {
+                    try {
+                        byte[] data = readStream(inputStream);
+                        if (data != null) {
+                            bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                            inputStream.close();
 
-                savePath = FileUtil.saveBitmapToFile(mContext, bitmap,
-                        mChapter.getBookId(), mChapter.get_id(), analysisImageUrl(imgUrl));
-                return savePath;
-            } else {
-                return null;
+
+                            int width = bitmap.getWidth();
+                            int height = bitmap.getHeight();
+                            Matrix matrix = new Matrix();
+                            //也可以按两者之间最大的比例来设置放大比例，这样不会是图片压缩
+                            float scale = caleScale(width);
+
+                            matrix.postScale(scale, scale); // 长和宽放大缩小的比例
+                            Bitmap resizeBmp = Bitmap.createBitmap(bitmap, 0, 0, width,
+                                    height, matrix, true);
+
+                            //保存图片到本地
+                            savePath = FileUtil.saveBitmapToFile(mContext, resizeBmp,
+                                    mChapter.getBookId(), mChapter.get_id(), analysisImageUrl(imgUrl));
+                            return savePath;
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
             }
         } catch (MalformedURLException e) {
             String msg = RxExceptionUtil.exceptionHandler(e);
@@ -245,6 +269,25 @@ public class DownloadTask extends AsyncTask<Object, ComicImageBean, ComicChapter
         return null;
     }
 
+    private float caleScale(int width) {
+        if (width > mPxWidth) return (float) mPxWidth / width;
+        return 1;
+    }
+
+    /*
+     * 得到图片字节流 数组大小
+     * */
+    private byte[] readStream(InputStream inStream) throws Exception {
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int len = 0;
+        while ((len = inStream.read(buffer)) != -1) {
+            outStream.write(buffer, 0, len);
+        }
+        outStream.close();
+        inStream.close();
+        return outStream.toByteArray();
+    }
 
     //保存图片路径到本地数据库
     private void saveImageUrlsToDB(List<ComicImageBean> list, Long bookId, Long

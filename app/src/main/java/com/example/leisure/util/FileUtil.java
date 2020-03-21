@@ -152,7 +152,7 @@ public class FileUtil {
 
         File file = new File(savePath);
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, bos);
         Log.d(TAG, savePath + " 保存成功");
         bos.flush();
         bos.close();

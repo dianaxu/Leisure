@@ -37,7 +37,7 @@ public class TestBitmapActivity extends AppCompatActivity {
     private ImageView mIvImage2;
     private ImageView mIvImage3;
     private TextView mTvInfo;
-    private String imageUrl = "https://m.comic123.net/pic-qq//manhua.qpic.cn/manhua_detail/0/30_17_33_5bf822924711dcbeefaeb2e54b2d1625_6689.jpg/0";
+    private String imageUrl = "https://m-bnmanhua-com.mipcdn.com/i/img.detatu.com/upload/files/25327/1316927/15609223732.jpg";
 
     private Handler mHandle = new Handler() {
         @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -51,7 +51,7 @@ public class TestBitmapActivity extends AppCompatActivity {
                     //解析图片名称出问题
                     String imageName = analysisImageUrl(imageUrl);
                     //图片名称解析完  存放的位置
-                    String savePath = FileUtil.getSavePath(TestBitmapActivity.this, (long) 1, (long) 1, imageName);
+                    String savePath = FileUtil.getSavePath(TestBitmapActivity.this, (long) 0, (long) 1, imageName);
                     ImageLoader.getInstance().withWidthMatch(TestBitmapActivity.this, widthPixels, savePath, mIvImage1);
                     break;
                 case 2:
@@ -59,16 +59,16 @@ public class TestBitmapActivity extends AppCompatActivity {
                     //解析图片名称出问题
                     String imageName1 = analysisImageUrl(imageUrl);
                     //图片名称解析完  存放的位置
-                    String savePath1 = FileUtil.getSavePath(TestBitmapActivity.this, (long) 1, (long) 2, imageName1);
-                    ImageLoader.getInstance().withWidthMatch(TestBitmapActivity.this, widthPixels,savePath1, mIvImage2);
+                    String savePath1 = FileUtil.getSavePath(TestBitmapActivity.this, (long) 0, (long) 2, imageName1);
+                    ImageLoader.getInstance().withWidthMatch(TestBitmapActivity.this, widthPixels, savePath1, mIvImage2);
                     break;
                 case 3:
                     mTvInfo.setText("\n" + mTvInfo.getText() + "最优方式：" + size);
                     //解析图片名称出问题
                     String imageName2 = analysisImageUrl(imageUrl);
                     //图片名称解析完  存放的位置
-                    String savePath2 = FileUtil.getSavePath(TestBitmapActivity.this, (long) 1, (long) 3, imageName2);
-                    ImageLoader.getInstance().withWidthMatch(TestBitmapActivity.this, widthPixels,savePath2, mIvImage3);
+                    String savePath2 = FileUtil.getSavePath(TestBitmapActivity.this, (long) 0, (long) 3, imageName2);
+                    ImageLoader.getInstance().withWidthMatch(TestBitmapActivity.this, widthPixels, savePath2, mIvImage3);
                     break;
                 default:
                     break;
@@ -149,7 +149,7 @@ public class TestBitmapActivity extends AppCompatActivity {
 
                 //保存图片到本地
                 savePath = FileUtil.saveBitmapToFile(this, bitmap,
-                        (long) 1, (long) 1, analysisImageUrl(imgUrl));
+                        (long) 0, (long) 1, analysisImageUrl(imgUrl));
                 return savePath;
             }
         } catch (MalformedURLException e) {
@@ -181,7 +181,7 @@ public class TestBitmapActivity extends AppCompatActivity {
 
             //保存图片到本地
             savePath = FileUtil.saveBitmapToFile1(this, bitmap,
-                    (long) 1, (long) 2, analysisImageUrl(imgUrl));
+                    (long) 0, (long) 2, analysisImageUrl(imgUrl));
             return savePath;
 
         } catch (MalformedURLException e) {
@@ -220,13 +220,14 @@ public class TestBitmapActivity extends AppCompatActivity {
                             int height = bitmap.getHeight();
                             Matrix matrix = new Matrix();
                             //也可以按两者之间最大的比例来设置放大比例，这样不会是图片压缩
+                            Log.e("sdfsdf", "downloadImage2: " + (float) widthPixels / width);
                             matrix.postScale((float) widthPixels / width, (float) widthPixels / width); // 长和宽放大缩小的比例
                             Bitmap resizeBmp = Bitmap.createBitmap(bitmap, 0, 0, width,
                                     height, matrix, true);
 
                             //保存图片到本地
                             savePath = FileUtil.saveBitmapToFile1(this, resizeBmp,
-                                    (long) 1, (long) 3, analysisImageUrl(imgUrl));
+                                    (long) 0, (long) 3, analysisImageUrl(imgUrl));
                             return savePath;
                         }
                     } catch (Exception e) {

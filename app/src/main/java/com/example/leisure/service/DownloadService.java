@@ -419,7 +419,7 @@ public class DownloadService extends Service implements DownloadTask.onDownLoadI
             Log.e("finish", "onFinishChapter: ----> cancel");
             bean.setCacheState(Constant.DownloadState.DOWNLOAD_CANCEL);
         }
-
+        mDaoSession.update(bean);
         //发送信息
         //关闭任务
         //检测是否全部任务完成
