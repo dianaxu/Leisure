@@ -7,6 +7,28 @@ import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
 
 public class ImageUtil {
+
+    /**
+     * 解析出图片名称
+     *
+     * @param imageUrl
+     * @return
+     */
+    public static String analysisImageUrl(String imageUrl) {
+        String imageFileName = null;
+        String[] split = imageUrl.split("/");
+        for (int i = 0; i < split.length; i++) {
+            if (split[i].contains(".jpg") || split[i].contains("png")) {
+                imageFileName = split[i];
+            }
+        }
+        if (imageFileName == null) return imageFileName;
+        else
+            return imageFileName.replace("_", "")
+                    .replace(".jpg", "")
+                    .replace(".png", "");
+    }
+
     public static Bitmap drawableToBitmap(Drawable drawable) {
 
         Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(),

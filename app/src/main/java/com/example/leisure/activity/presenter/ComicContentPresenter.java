@@ -24,6 +24,7 @@ import com.example.leisure.retrofit.RetrofitComicUtils;
 import com.example.leisure.retrofit.RxHelper;
 import com.example.leisure.util.Constant;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.RequiresApi;
@@ -55,6 +56,10 @@ public class ComicContentPresenter {
         if (mBook != null)
             return mBook.get_id();
         return null;
+    }
+
+    public boolean isBookCached() {
+        return mBook.getCacheState() == Constant.DownloadState.DOWNLOADED;
     }
 
     public String getmBookName() {
@@ -273,18 +278,33 @@ public class ComicContentPresenter {
 
     //将章节加入到DB
     private void saveComicChapterToDB(int startPosition, int state) {
+
+        List<ComicImageBean> lsImages = new ArrayList<>();
         for (int i = 0; i < mBook.lsChapter.size(); i++) {
             ComicChapterBean chapterBean = mBook.lsChapter.get(i);
-            if (startPosition == i)
+            if (i >= startPosition)
                 chapterBean.setCacheState(state);
             else
                 chapterBean.setCacheState(Constant.DownloadState.DOWNLOAD_NOT);
             chapterBean.setIsCaching(false);
             chapterBean.setCacheCount(0);
-            chapterBean.setMaxCount(0);
+            chapterBean.setMaxCount(mBook.lsChapter.get(i).list != null ? mBook.lsChapter.get(i).list.size() : 0);
             chapterBean.setBookId(mBook.get_id());
+            long chapterId = mDaoSession.getComicChapterBeanDao().insert(chapterBean);
+            chapterBean.set_id(chapterId);
+            if (chapterBean.getMaxCount() != 0) {
+                int count = mBook.lsChapter.get(i).list.size();
+                for (int j = 0; j < count; j++) {
+                    ComicImageBean imageBean = mBook.lsChapter.get(i).list.get(j);
+                    imageBean.setChapterId(chapterId);
+                    imageBean.setBookId(mBook.get_id());
+                    imageBean.setIsCaching(false);
+                    lsImages.add(imageBean);
+                }
+            }
         }
-        mDaoSession.getComicChapterBeanDao().insertInTx(mBook.lsChapter);
+        if (lsImages.size() > 0)
+            mDaoSession.getComicImageBeanDao().insertInTx(lsImages);
     }
 
     //保存图片集到DB
@@ -349,7 +369,6 @@ public class ComicContentPresenter {
             saveComicChapterToDB(startPos, Constant.DownloadState.DOWNLOADING);
 
         //图片加入
-        saveImagesToDB(mBook.lsChapter.get(getReadPosition()).list);
 
         if (bookId >= 0) {
             EventBusUtil.sendEvent(new Event(EventCode.BOOKSHELF_ADD_COMIC));
@@ -369,7 +388,7 @@ public class ComicContentPresenter {
 
         int chapterSize = mBook.getLsChapter().size();
         for (int i = 0; i < chapterSize; i++) {
-            if (i >= startPosition)
+            if (i >= startPosition && !mBook.getLsChapter().get(i).getIsCaching())
                 mBook.getLsChapter().get(i).setCacheState(Constant.DownloadState.DOWNLOADING);
         }
         mDaoSession.getComicChapterBeanDao().updateInTx(mBook.getLsChapter());

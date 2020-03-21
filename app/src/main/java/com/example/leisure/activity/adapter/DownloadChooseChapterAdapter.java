@@ -1,6 +1,7 @@
 package com.example.leisure.activity.adapter;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -55,6 +56,8 @@ public class DownloadChooseChapterAdapter extends BaseRecyclerViewAdapter<ComicC
         ImageView ivImage = (ImageView) holder.getView(R.id.iv_image);
         ComicChapterBean bean = mLsData.get(position);
         tvName.setText(mLsData.get(position).getNum());
+        tvName.setLines(1);
+        tvName.setEllipsize(TextUtils.TruncateAt.END);
 
         //未处理的章节
         if (bean.getCacheState() == Constant.DownloadState.DOWNLOAD_NOT) {

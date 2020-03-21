@@ -1,20 +1,23 @@
 package com.example.leisure.activity;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.leisure.MainApplication;
 import com.example.leisure.R;
 import com.example.leisure.activity.adapter.BaseRecyclerViewAdapter;
-import com.example.leisure.activity.adapter.BaseViewHolder;
 import com.example.leisure.activity.adapter.DownloadComicAdapter;
 import com.example.leisure.db.greendao.ComicBookBean;
 import com.example.leisure.greenDao.gen.DaoSession;
-import com.example.leisure.receiver.DownloadReceiver;
 import com.example.leisure.service.DownloadService;
+import com.example.leisure.service.IDownloadBookCallback;
 import com.example.leisure.util.Constant;
 import com.example.leisure.util.ScreenInfoUtils;
 import com.example.leisure.widget.CommonToolbar;
@@ -26,7 +29,9 @@ import java.util.List;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import static com.example.leisure.util.Constant.ReceiverAction.ACTION_DOWNLOAD;
+import static com.example.leisure.activity.adapter.DownloadComicAdapter.UPDATE_ITEM_FINISH;
+import static com.example.leisure.activity.adapter.DownloadComicAdapter.UPDATE_ITEM_PROGRESS;
+import static com.example.leisure.activity.adapter.DownloadComicAdapter.UPDATE_ITEM_STATE;
 
 /**
  * 缓存管理
@@ -38,10 +43,11 @@ import static com.example.leisure.util.Constant.ReceiverAction.ACTION_DOWNLOAD;
  * 6.实现DownloadService的binder 进行章节下载后通知界面显示水波的更新
  */
 public class DownloadComicActivity extends BaseActivity implements BaseRecyclerViewAdapter.OnItemClickListener<ComicBookBean>
-        , DownloadComicAdapter.onTaskListener, DownloadReceiver.onUpdateUIListener, DownloadReceiver.onCancelOrAddListener {
-    private static final int SPAN_COUNT_LAND = 6;
+        , DownloadComicAdapter.onTaskListener, IDownloadBookCallback {
+    private String TAG = "DownloadComicActivity";
+    private static final int SPAN_COUNT_LAND = 5;
     private static final int SPAN_COUNT_PORT = 3;
-    private static final int SPACING = 16;
+    private static final int SPACING = 8;
     //初始化控件
     private RecyclerView mRvView;
     private CommonToolbar mCtbHeader;
@@ -51,8 +57,10 @@ public class DownloadComicActivity extends BaseActivity implements BaseRecyclerV
     private int mSpanCount;
 
     private DaoSession mDaoSession;
-    private DownloadReceiver mReceiver;
     private DownloadService mService;
+    private ServiceConnection mConn;
+    private boolean isFront = true;
+    private boolean hasStopService = false;
 
 
     public static void startDownloadComicActivity(Context context) {
@@ -70,15 +78,21 @@ public class DownloadComicActivity extends BaseActivity implements BaseRecyclerV
         return true;
     }
 
+    //获取数据
+    private void getData() {
+        mDaoSession.clear();
+        mLsData = mDaoSession.getComicBookBeanDao().queryBuilder().list();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_download_comic);
+        Log.e(TAG, "book----> onCreate: ");
         //获取本地数据库
         mDaoSession = MainApplication.getInstance().getDaoSession();
-        mService = MainApplication.getInstance().getDownloadService();
-        getData();
         mSpanCount = ScreenInfoUtils.isWindowOrientationLand(this) ? SPAN_COUNT_LAND : SPAN_COUNT_PORT;
+        setContentView(R.layout.activity_download_comic);
+        getData();
 
         //初始化控件
         mRvView = findViewById(R.id.rv_view);
@@ -93,19 +107,15 @@ public class DownloadComicActivity extends BaseActivity implements BaseRecyclerV
                 finish();
             }
         });
-
-        //注册广播
-        registerReceiver();
-
-        if (mService != null)
-            mService.startTask();
+        //开启服务及绑定服务
+        startService();
     }
 
     //初始化RecyclerView
     private void initRecyclerView() {
         GridLayoutManager layoutManager = new GridLayoutManager(this, mSpanCount);
         mRvView.setLayoutManager(layoutManager);
-        mRvView.addItemDecoration(new GridSpacingItemDecoration(mSpanCount, SPACING, true));
+        mRvView.addItemDecoration(new GridSpacingItemDecoration(mSpanCount, SPACING, false));
         mAdapter = new DownloadComicAdapter(this, mLsData);
 
         mRvView.setAdapter(mAdapter);
@@ -113,37 +123,67 @@ public class DownloadComicActivity extends BaseActivity implements BaseRecyclerV
         mAdapter.addnTaskListener(this);
     }
 
-    //获取数据
-    private void getData() {
-        mLsData = MainApplication.getInstance().getDaoSession().getComicBookBeanDao().queryBuilder().list();
-    }
+    //开启服务及绑定服务
+    private void startService() {
+        Intent intent = new Intent(this, DownloadService.class);
+        startService(intent);
+        mConn = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                DownloadService.DownloadBinder binder = (DownloadService.DownloadBinder) service;
+                mService = binder.getService();
+                mService.registerCallBack(DownloadComicActivity.this);
+            }
 
-    //注册下载广播
-    private void registerReceiver() {
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(ACTION_DOWNLOAD);
-        mReceiver = new DownloadReceiver(this);
-        mReceiver.addOnCancelListener(this);
-        registerReceiver(mReceiver, intentFilter);
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+                mService.unRegisterCallBack(DownloadComicActivity.this);
+                mService = null;
+            }
+        };
+        bindService(intent, mConn, BIND_AUTO_CREATE);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        if (mService != null) {
-            boolean hasTask = mService.hasTask();
-            if (!hasTask) mService.startTask();
-        }
+        getData();
+        mAdapter.updateData(mLsData);
+        Log.e(TAG, "book----> onStart: " + mLsData.get(0).getCacheState());
+        if (mService != null)
+            mService.registerCallBack(DownloadComicActivity.this);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        isFront = true;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        isFront = false;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.e(TAG, "book----> onStop: ");
+        if (!hasStopService)
+            if (mService != null) {
+                mService.unRegisterCallBack(this);
+            }
+    }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (mReceiver != null)
-            unregisterReceiver(mReceiver);
+        Log.e(TAG, "book----> onDestroy: ");
+        if (!hasStopService)
+            if (mService != null)
+                unbindService(mConn);
     }
-
 
     @Override
     public void onItemClick(View view, int position, ComicBookBean bean) {
@@ -161,47 +201,72 @@ public class DownloadComicActivity extends BaseActivity implements BaseRecyclerV
 
     @Override
     public void startTask(ComicBookBean bean) {
+        String sql = updateChapterStateStr(bean.get_id(), Constant.DownloadState.DOWNLOAD_CANCEL, Constant.DownloadState.DOWNLOADING);
+        mDaoSession.getDatabase().execSQL(sql);
+
+        bean.setCacheState(Constant.DownloadState.DOWNLOADING);
+        mDaoSession.update(bean);
         //开始书本章节的任务下载
         if (mService != null)
-            mService.addMoreCanceledTask(bean.get_id());
+            mService.addTask(bean.get_id());
     }
 
     @Override
     public void stopTask(ComicBookBean bean) {
+        String sql = updateChapterStateStr(bean.get_id(), Constant.DownloadState.DOWNLOADING, Constant.DownloadState.DOWNLOAD_CANCEL);
+        mDaoSession.getDatabase().execSQL(sql);
+
+        bean.setCacheState(Constant.DownloadState.DOWNLOAD_CANCEL);
+        mDaoSession.update(bean);
         //暂停书本章节的任务下载
         if (mService != null)
-            mService.cancelBookTask(bean);
+            mService.cancelChaptersTask(bean.get_id());
+    }
+
+    private String updateChapterStateStr(long bookId, int oldState, int newState) {
+        StringBuffer sqlStr = new StringBuffer();
+        sqlStr.append("update Comic_chapter_bean set cache_state = " + newState);
+        sqlStr.append(" where book_id = " + bookId);
+        sqlStr.append(" and cache_state = " + oldState);
+        return sqlStr.toString();
     }
 
     @Override
-    public void updateUI(DownloadReceiver.ReceiverBean bean) {
-        int position = mAdapter.getPosition(bean.bookId);
-        BaseViewHolder viewHolder = (BaseViewHolder) mRvView.findViewHolderForAdapterPosition(position);
-        mAdapter.updateProgress(viewHolder, position, bean.bookId, bean.bookProgress, bean.bookCacheState, false);
+    public void onNotConnWifi() {
+        getData();
+        mAdapter.updateData(mLsData);
+        Toast.makeText(DownloadComicActivity.this,
+                getResources().getText(R.string.net_not_connected_wifi),
+                Toast.LENGTH_SHORT).show();
     }
 
     @Override
-    public void promptStart(DownloadReceiver.ReceiverPromptBean bean) {
-
+    public void onFinishStopSelf() {
+        hasStopService = true;
     }
 
     @Override
-    public void promptFail(DownloadReceiver.ReceiverPromptBean bean) {
-
+    public void onUpdateProgressBook(long bookId, float progress) {
+        int position = mAdapter.getPosition(bookId);
+        if (position == -1) return;
+        mLsData.get(position).setProgress(progress);
+        mAdapter.notifyItemChanged(position, UPDATE_ITEM_PROGRESS);
     }
 
     @Override
-    public void finishDown(DownloadReceiver.ReceiverBean bean) {
-        int position = mAdapter.getPosition(bean.bookId);
-        BaseViewHolder viewHolder = (BaseViewHolder) mRvView.findViewHolderForAdapterPosition(position);
-        mAdapter.updateProgress(viewHolder, position, bean.bookId, bean.bookProgress, bean.bookCacheState, true);
+    public void onFinishBook(long bookId, float progress, int state) {
+        int position = mAdapter.getPosition(bookId);
+        if (position == -1) return;
+        mLsData.get(position).setProgress(progress);
+        mLsData.get(position).setCacheState(state);
+        mAdapter.notifyItemChanged(position, UPDATE_ITEM_FINISH);
     }
 
-
     @Override
-    public void cancelOrAddTask(DownloadReceiver.ReceiverCancelBean bean) {
-        int position = mAdapter.getPosition(bean.bookId);
-        BaseViewHolder viewHolder = (BaseViewHolder) mRvView.findViewHolderForAdapterPosition(position);
-        mAdapter.updateState(viewHolder, position, bean.bookState);
+    public void onUpdateBookState(long bookId, int state) {
+        int position = mAdapter.getPosition(bookId);
+        if (position == -1) return;
+        mLsData.get(position).setCacheState(state);
+        mAdapter.notifyItemChanged(position, UPDATE_ITEM_STATE);
     }
 }

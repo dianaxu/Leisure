@@ -145,7 +145,28 @@ public class FileUtil {
      * @param bookId    下载文件保存目录
      * @param imageName 文件名称(不带后缀)
      */
-    public static String saveBitmapToFile(Context context, Bitmap bitmap, long bookId, long chapterId, String imageName) throws IOException {
+    public static String saveBitmapToFile(Context context, Bitmap bitmap, Long bookId, Long chapterId, String imageName) throws IOException {
+        String fileName = File.separator + bookId + File.separator + chapterId;
+        File folder = createFile(context, fileName);
+        String savePath = folder.getPath() + File.separator + imageName + ".jpg";
+
+        File file = new File(savePath);
+        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
+        Log.d(TAG, savePath + " 保存成功");
+        bos.flush();
+        bos.close();
+        return savePath;
+    }
+
+    /**
+     * 保存图片到SD卡
+     *
+     * @param bitmap    图片bitmap对象
+     * @param bookId    下载文件保存目录
+     * @param imageName 文件名称(不带后缀)
+     */
+    public static String saveBitmapToFile1(Context context, Bitmap bitmap, Long bookId, Long chapterId, String imageName) throws IOException {
         String fileName = File.separator + bookId + File.separator + chapterId;
         File folder = createFile(context, fileName);
         String savePath = folder.getPath() + File.separator + imageName + ".jpg";
@@ -199,7 +220,7 @@ public class FileUtil {
             filePath.append(File.separator + chapterId);
         }
         if (imageName != null) {
-            filePath.append(File.separator + imageName + "jpg");
+            filePath.append(File.separator + imageName + ".jpg");
         }
 
         return filePath.toString();

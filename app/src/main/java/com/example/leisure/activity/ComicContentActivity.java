@@ -94,6 +94,7 @@ public class ComicContentActivity extends BaseActivity implements View.OnClickLi
         initTwinklingRefreshLayout(); //初始化刷新控件
         initRecyclerView();
 
+        mCtbHeader.setText(mPresenter.getmBookName());
         mPresenter.getComicImages(mPresenter.getReadPosition(), true, true);  //获取漫画内容
         mService = MainApplication.getInstance().getDownloadService();
     }
@@ -137,7 +138,7 @@ public class ComicContentActivity extends BaseActivity implements View.OnClickLi
                     return;
                 }
 
-                if (hasNoData(position)) {
+                if (hasNoData(--position)) {
                     //todo 网络上获取当前章节的漫画链接集
                     mPresenter.getComicImages(position, false, false);
                 } else {
@@ -150,13 +151,13 @@ public class ComicContentActivity extends BaseActivity implements View.OnClickLi
             @Override
             public void onLoadMore(TwinklingRefreshLayout refreshLayout) {
                 int position = mPresenter.getReadPosition();
-                if (position != mAdapter.getItemCount() - 1) {
+                if (position == mLsChapter.size() - 1) {
                     refreshLayout.finishLoadmore();
                     Toast.makeText(ComicContentActivity.this, "已到达最后一章", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                if (hasNoData(position)) {
+                if (hasNoData(++position)) {
                     //todo 网络上获取当前章节的漫画链接集
                     mPresenter.getComicImages(position, false, false);
                 } else {
@@ -262,11 +263,13 @@ public class ComicContentActivity extends BaseActivity implements View.OnClickLi
             dialog.addOnSelectCacheListener(new SelectCacheDialog.OnSelectCacheListener() {
                 @Override
                 public void onDownloadAll() {
+                    if (mPresenter.isBookCached()) return;
                     cacheComic(true);
                 }
 
                 @Override
                 public void onCurrentPosition() {
+                    if (mPresenter.isBookCached()) return;
                     cacheComic(false);
                 }
 
@@ -284,12 +287,12 @@ public class ComicContentActivity extends BaseActivity implements View.OnClickLi
         Long bookId = mPresenter.getBookId();
         if (mPresenter.isAddBookShelf()) {
             mPresenter.updateState(isCacheAll);
-            mService.addMoreTask(bookId);
+            mService.addTask(bookId);
         } else {
             mPresenter.addBookToDB(isCacheAll);
             bookId = mPresenter.getBookId();
             if (bookId != null)
-                mService.addMoreTask(bookId);
+                mService.addTask(bookId);
         }
     }
 
@@ -377,6 +380,6 @@ public class ComicContentActivity extends BaseActivity implements View.OnClickLi
 
     @Override
     public void addComicSuccessToDB(long bookId) {
-        mService.addMoreTask(bookId);
+        mService.addTask(bookId);
     }
 }

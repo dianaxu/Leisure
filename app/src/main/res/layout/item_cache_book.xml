@@ -4,13 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    android:gravity="center"
+
     android:orientation="vertical">
 
     <FrameLayout
         android:id="@+id/fl_content"
-        android:layout_width="90dp"
-        android:layout_height="120dp">
+        android:layout_width="105dp"
+        android:layout_height="140dp"
+        android:layout_centerHorizontal="true">
 
         <ImageView
             android:id="@+id/iv_image"
@@ -30,7 +31,7 @@
             android:layout_gravity="center"
             android:clickable="true"
             android:padding="@dimen/imagePadding"
-            android:src="@drawable/selector_share" />
+            tools:src="@drawable/selector_download_play_or_pause" />
 
         <TextView
             android:id="@+id/tv_finish"
@@ -45,11 +46,14 @@
 
     <TextView
         android:id="@+id/tv_name"
-        android:layout_width="wrap_content"
+        android:layout_width="105dp"
         android:layout_height="wrap_content"
         android:layout_below="@id/fl_content"
-        android:layout_marginTop="@dimen/imagePadding"
+        android:layout_alignLeft="@id/fl_content"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:textColor="@color/textTitleColor"
+        android:textSize="@dimen/itemDesS"
         tools:text="名侦探柯南" />
 
 </RelativeLayout>

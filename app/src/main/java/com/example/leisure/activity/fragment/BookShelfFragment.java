@@ -42,11 +42,12 @@ import androidx.recyclerview.widget.RecyclerView;
  * 2.显示加入书架的漫画书列表 sqlite
  */
 public class BookShelfFragment extends BaseFragment implements TextView.OnEditorActionListener,
-        BaseRecyclerViewAdapter.OnItemClickListener<ComicBookBean>, MySearchTextWatcher.OnEmptyListener {
+        BaseRecyclerViewAdapter.OnItemClickListener<ComicBookBean>, MySearchTextWatcher.OnEmptyListener, MySearchTextWatcher.OnInputTextListener {
 
     private View mView;
     private EditText mEtSearch;
     private RecyclerView mRvView;
+    private ImageView mIvDelText;
 
     private ComicBookBeanDao mComicBookBeanDao;
     private BaseRecyclerViewAdapter mAdapter;
@@ -86,13 +87,22 @@ public class BookShelfFragment extends BaseFragment implements TextView.OnEditor
         mView = inflater.inflate(R.layout.fragment_bookshelf, container, false);
         mEtSearch = mView.findViewById(R.id.et_search);
         mRvView = mView.findViewById(R.id.rv_view);
+        mIvDelText = mView.findViewById(R.id.iv_del_text);
 
         mEtSearch.setOnEditorActionListener(this);
         MySearchTextWatcher watcher = new MySearchTextWatcher();
+        watcher.addOnInputTextListener(this);
         watcher.addOnEmptyListener(this);
         mEtSearch.addTextChangedListener(watcher);
 
         initRecyclerView();
+
+        mIvDelText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mEtSearch.setText("");
+            }
+        });
         return mView;
     }
 
@@ -114,7 +124,7 @@ public class BookShelfFragment extends BaseFragment implements TextView.OnEditor
                 holder.setText(R.id.tv_latest, bean.getLatest());
                 holder.setText(R.id.tv_time, bean.getTime());
 
-                ImageLoader.with(getContext(), bean.getCover(), (ImageView) holder.getView(R.id.iv_cover));
+                ImageLoader.getInstance().with(getContext(), bean.getCover(), (ImageView) holder.getView(R.id.iv_cover));
             }
         };
         mRvView.setAdapter(mAdapter);
@@ -174,6 +184,7 @@ public class BookShelfFragment extends BaseFragment implements TextView.OnEditor
 
     @Override
     public void onEmpty() {
+        mIvDelText.setVisibility(View.GONE);
         getComicBookBean();
     }
 
@@ -186,9 +197,14 @@ public class BookShelfFragment extends BaseFragment implements TextView.OnEditor
 
     private void getComicBookBean(String value) {
         mLsData = mComicBookBeanDao.queryBuilder()
-                .where(ComicBookBeanDao.Properties.Name.like(value))
+                .where(ComicBookBeanDao.Properties.Name.like("%" + value + "%"))
                 .orderDesc(ComicBookBeanDao.Properties.LastTime)
                 .list();
         mAdapter.updateData(mLsData);
+    }
+
+    @Override
+    public void onInputText(String value) {
+        mIvDelText.setVisibility(View.VISIBLE);
     }
 }

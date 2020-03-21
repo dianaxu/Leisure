@@ -2,6 +2,7 @@ package com.example.leisure.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -16,6 +17,8 @@ import com.example.leisure.db.greendao.ComicBookBean;
 import com.example.leisure.glide.ImageLoader;
 import com.example.leisure.util.ScreenInfoUtils;
 import com.example.leisure.widget.CommonToolbar;
+
+import androidx.annotation.RequiresApi;
 
 /**
  * 漫画详情
@@ -149,12 +152,14 @@ public class ComicDetailsActivity extends BaseActivity implements View.OnClickLi
         }
     }
 
+
     @Override
     public void updateUI(String bookName, String bookCover) {
-        ImageLoader.with(this, bookCover, mIvCover);
+        ImageLoader.getInstance().with(this, bookCover, mIvCover);
         mTvName.setText(bookName);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
     public void updateUI(ComicBookBean bean) {
         mRlError.setVisibility(View.GONE);
@@ -167,7 +172,7 @@ public class ComicDetailsActivity extends BaseActivity implements View.OnClickLi
         mTvTime.setText("最近更新：" + bean.time);
         mTvlatest.setText("更新至：" + bean.latest);
 
-        ImageLoader.with(this, bean.cover, mIvCover);
+        ImageLoader.getInstance().with(getApplicationContext(), bean.cover, mIvCover);
     }
 
     @Override

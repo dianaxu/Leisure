@@ -34,7 +34,6 @@ import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
 
 public class MainActivity extends BaseActivity implements View.OnClickListener {
-    //    private static final String BUNDLE_KEY_POS = "key_pos";
     private static final String BUNDLE_KEY_CURRENT_PAGE = "key_current_page";
 
     private final String TAG = "MainActivity";
@@ -56,7 +55,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     @Override
     protected TransitionMode getOverridePendingTransitionMode() {
-        return TransitionMode.BOTTOM;
+        return TransitionMode.RIGHT;
     }
 
     @Override
@@ -68,7 +67,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (savedInstanceState != null) {
-//            mSavePosition = savedInstanceState.getInt(BUNDLE_KEY_POS, 0);
             mCurrentPage = savedInstanceState.getInt(BUNDLE_KEY_CURRENT_PAGE, 0);
         }
 

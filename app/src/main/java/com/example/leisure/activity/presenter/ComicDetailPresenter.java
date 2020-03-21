@@ -113,6 +113,8 @@ public class ComicDetailPresenter {
                     .where(ComicBookBeanDao.Properties.Url.eq(mhurl1))
                     .build()
                     .unique();
+        if (mBook != null)
+            mBook.getLsChapter();
     }
 
     //通过网络获取漫画信息

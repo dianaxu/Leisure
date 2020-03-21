@@ -4,16 +4,15 @@
     android:id="@+id/rl_bar"
     android:layout_width="match_parent"
     android:layout_height="@dimen/tabbarH"
-    android:background="@android:color/transparent"
-    android:paddingLeft="@dimen/margin"
-    android:paddingRight="@dimen/margin">
+    android:background="@android:color/transparent">
 
     <ImageView
         android:id="@+id/iv_left"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_centerVertical="true" />
+        android:layout_centerVertical="true"
+        android:padding="@dimen/margin" />
 
     <LinearLayout
         android:id="@+id/ll_search"
@@ -53,8 +52,8 @@
         android:layout_centerInParent="true"
         android:layout_gravity="center"
         android:textSize="@dimen/tabbarTextS"
-        tools:text="名侦探柯南"
-        android:visibility="visible" />
+        android:visibility="visible"
+        tools:text="名侦探柯南" />
 
     <ImageView
         android:id="@+id/iv_right"
@@ -70,6 +69,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
+        android:layout_marginRight="@dimen/imagePadding"
         android:padding="@dimen/imagePadding"
         android:textSize="@dimen/itemTitleS"
         tools:text="正序" />

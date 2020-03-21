@@ -53,6 +53,16 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Ba
     }
 
     @Override
+    public void onBindViewHolder(@NonNull BaseViewHolder holder, int position, @NonNull List<Object> payloads) {
+        if (payloads.isEmpty())
+            onBindViewHolder(holder, position);
+        else {
+            //更新控件
+            onBindView(holder, position, payloads);
+        }
+    }
+
+    @Override
     public void onBindViewHolder(@NonNull BaseViewHolder holder, int position) {
         holder.setItemListener(position, this);
         onBindView(holder, position);
@@ -69,6 +79,9 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Ba
 
     public abstract void onBindView(BaseViewHolder holder, int position);
 
+    protected void onBindView(BaseViewHolder holder, int position, List<Object> payloads) {
+
+    }
     public List<T> getData() {
         return mLsData;
     }
@@ -99,8 +112,4 @@ public abstract class BaseRecyclerViewAdapter<T> extends RecyclerView.Adapter<Ba
         notifyDataSetChanged();
     }
 
-
-//    public interface OnRecyclerViewItemClickListener<T> {
-//        void onRecyclerViewItemClick(View view, int position, T bean);
-//    }
 }

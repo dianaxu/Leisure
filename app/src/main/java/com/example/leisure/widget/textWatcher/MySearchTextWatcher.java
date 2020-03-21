@@ -7,6 +7,7 @@ import android.text.TextWatcher;
 public class MySearchTextWatcher implements TextWatcher {
     private OnInputCompleteListener mListener;
     private OnEmptyListener mEmptyListener;
+    private OnInputTextListener mInputTextListtener;
 
     public MySearchTextWatcher() {
     }
@@ -21,6 +22,10 @@ public class MySearchTextWatcher implements TextWatcher {
 
     public void addOnEmptyListener(OnEmptyListener listener) {
         this.mEmptyListener = listener;
+    }
+
+    public void addOnInputTextListener(OnInputTextListener listener) {
+        this.mInputTextListtener = listener;
     }
 
     @Override
@@ -49,6 +54,11 @@ public class MySearchTextWatcher implements TextWatcher {
                 mEmptyListener.onEmpty();
             }
         }
+        if (str.length() > 0) {
+            if (mInputTextListtener != null) {
+                mInputTextListtener.onInputText(str);
+            }
+        }
 
     }
 
@@ -58,5 +68,9 @@ public class MySearchTextWatcher implements TextWatcher {
 
     public interface OnEmptyListener {
         void onEmpty();
+    }
+
+    public interface OnInputTextListener {
+        void onInputText(String value);
     }
 }

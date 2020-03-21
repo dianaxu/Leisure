@@ -158,10 +158,6 @@ public class ChapterFragment extends Fragment implements BaseRecyclerViewAdapter
 //                tvNum.setTextColor(getResources().getColor(R.color.textTitleColor));
                 tvPresence.setVisibility(bean.getIsCaching() ? View.VISIBLE : View.GONE);
 
-
-                //todo 需要去判断是否已经缓存了
-                holder.getView(R.id.tv_presence).setVisibility(View.GONE);
-
             }
         };
 

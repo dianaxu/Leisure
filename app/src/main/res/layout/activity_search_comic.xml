@@ -11,14 +11,14 @@
         android:id="@+id/view_status_bar"
         style="@style/MyStatusBar" />
 
-    <!--    <com.example.leisure.widget.CommonToolbar-->
-    <!--        android:id="@+id/ctb_header"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="@dimen/tabbarH"-->
-    <!--        android:background="@color/toolbarBlueBg"-->
-    <!--        app:toolbar_left_drawable="@drawable/selector_back"-->
-    <!--        app:toolbar_text="搜索漫画"-->
-    <!--        app:toolbar_text_color="@color/loginTextColor" />-->
+<!--    <com.example.leisure.widget.CommonToolbar-->
+<!--        android:id="@+id/ctb_header"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="@dimen/tabbarH"-->
+<!--        android:background="@color/toolbarBlueBg"-->
+<!--        app:toolbar_left_drawable="@drawable/selector_back"-->
+<!--        app:toolbar_text="搜索漫画"-->
+<!--        app:toolbar_text_color="@color/loginTextColor" />-->
 
     <!--    搜索框-->
 
@@ -57,9 +57,11 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_old_search"
         android:layout_width="match_parent"
+        android:layout_marginLeft="@dimen/imagePadding"
+        android:layout_marginRight="@dimen/imagePadding"
         android:layout_height="match_parent"
         android:layout_marginTop="@dimen/imagePadding"
-        android:background="@color/itemBg"
+        android:background="@color/contentBg"
         android:visibility="visible" />
 
     <!--    搜索结果-->
@@ -68,7 +70,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="@dimen/imagePadding"
-        android:background="@color/itemBg"
+        android:background="@color/contentBg"
         android:visibility="gone" />
 
 </LinearLayout>

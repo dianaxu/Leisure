@@ -62,7 +62,6 @@
         android:id="@+id/tv_count"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/imagePadding"
         android:background="@color/chapterBg"
         android:gravity="center_horizontal"
         android:paddingLeft="@dimen/margin"

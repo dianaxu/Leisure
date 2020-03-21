@@ -28,7 +28,7 @@ public class WYNewsAdapter extends BaseRecyclerViewAdapter<WangYiNewsBean> imple
         WangYiNewsBean bean = mLsData.get(position);
         holder.setText(R.id.tv_title, bean.title);
         ImageView imageView = (ImageView) holder.getView(R.id.iv_image);
-        ImageLoader.with(mContext, bean.image, imageView);
+        ImageLoader.getInstance().with(mContext, bean.image, imageView);
         String time = bean.passtime.split(" ")[0].replace("-", ".");
         holder.setText(R.id.tv_time, time);
 

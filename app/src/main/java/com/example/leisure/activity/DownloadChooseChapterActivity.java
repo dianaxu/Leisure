@@ -167,15 +167,17 @@ public class DownloadChooseChapterActivity extends BaseActivity implements View.
         if (mAdapter.getSelectedChapters().size() == 0) {
             Toast.makeText(this, "请选择需要下载的章节！", Toast.LENGTH_SHORT).show();
             return;
-        } else {
-            //todo 需要提示确定下载
         }
 
         //保存数据  跳转到详细下载页
         List<ComicChapterBean> selectChapter = mAdapter.getSelectChapter();
         updateChapterCacheState(Constant.DownloadState.DOWNLOADING, selectChapter);
 
-        EventBusUtil.sendEvent(new Event(EventCode.Download_ADD_MORE));
+        String sqlStr = "update comic_book_bean set cache_state = " + Constant.DownloadState.DOWNLOADING
+                + " where _id = " + mBookId;
+        mDaoSession.getDatabase().execSQL(sqlStr);
+
+        EventBusUtil.sendEvent(new Event(EventCode.DOWNLOAD_ADD_MORE));
         DownloadChapterActivity.startDownloadChapterActivity(this, mBookId, mBookName, true);
         finish();
     }

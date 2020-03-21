@@ -97,7 +97,7 @@ public class MusicChannelDetailsActivity extends AppCompatActivity implements Vi
         initMedioPlay();
 
         mTvTitle.setText(mName);
-        ImageLoader.with(this, mThumb, mIvImage);
+        ImageLoader.getInstance().with(this, mThumb, mIvImage);
 
         mIvBack.setOnClickListener(this);
         mRlPlayAll.setOnClickListener(this);

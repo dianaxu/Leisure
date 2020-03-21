@@ -46,23 +46,22 @@ public abstract class BaseFragment extends Fragment {
      */
     private void initStatusBar(View view) {
         //通过设置全屏，设置状态栏透明
-        ScreenInfoUtils.fullScreen(getActivity());
-        //初始化状态栏的高度
-//        ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(MATCH_PARENT, mStatusBarHeight);
-//        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(MATCH_PARENT, mStatusBarHeight);
-        View bar = view.findViewById(getStatusBarId());
-        if (bar == null) return;
-        if (bar.getLayoutParams() instanceof ConstraintLayout.LayoutParams) {
-            ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(MATCH_PARENT, mStatusBarHeight);
-            bar.setLayoutParams(params);
-        } else if (bar.getLayoutParams() instanceof RelativeLayout.LayoutParams) {
-            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(MATCH_PARENT, mStatusBarHeight);
-            bar.setLayoutParams(params);
-        } else if (bar.getLayoutParams() instanceof LinearLayout.LayoutParams) {
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(MATCH_PARENT, mStatusBarHeight);
-            bar.setLayoutParams(params);
+        boolean isFullScreen = ScreenInfoUtils.fullScreen(getActivity());
+        if (isFullScreen) {
+            //初始化状态栏的高度
+            View bar = view.findViewById(getStatusBarId());
+            if (bar == null) return;
+            if (bar.getLayoutParams() instanceof ConstraintLayout.LayoutParams) {
+                ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(MATCH_PARENT, mStatusBarHeight);
+                bar.setLayoutParams(params);
+            } else if (bar.getLayoutParams() instanceof RelativeLayout.LayoutParams) {
+                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(MATCH_PARENT, mStatusBarHeight);
+                bar.setLayoutParams(params);
+            } else if (bar.getLayoutParams() instanceof LinearLayout.LayoutParams) {
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(MATCH_PARENT, mStatusBarHeight);
+                bar.setLayoutParams(params);
+            }
         }
-
     }
 
 

@@ -90,7 +90,7 @@ public class ComicContentGroupedListAdapter extends GroupedRecyclerViewAdapter {
     public void onBindChildViewHolder(BaseViewHolder holder, int groupPosition, int childPosition) {
         if (mLsData.get(groupPosition).visible) {
             ImageView imageView = holder.get(R.id.iv_cover);
-            ImageLoader.withWidthWa(mContext, mWindowWidth, mLsData.get(groupPosition).list.get(childPosition).img, imageView);
+            ImageLoader.getInstance().withWidthMatch(mContext, mWindowWidth, mLsData.get(groupPosition).list.get(childPosition).img, imageView);
             imageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

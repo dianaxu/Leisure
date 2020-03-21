@@ -97,7 +97,7 @@ public class MusicFragment extends Fragment implements BaseRecyclerViewAdapter.O
                 ChannellistBean bean = mLsData.get(position);
                 holder.setText(R.id.tv_text, bean.name);
                 ImageView imageView = (ImageView) holder.getView(R.id.iv_image);
-                ImageLoader.with(mContext, bean.thumb, imageView);
+                ImageLoader.getInstance().with(mContext, bean.thumb, imageView);
             }
         };
 

@@ -25,8 +25,8 @@ public class JokeAdapter extends BaseRecyclerViewAdapter<JokeBean> {
     @Override
     public void onBindView(BaseViewHolder holder, int position) {
         JokeBean bean = mLsData.get(position);
-        ImageLoader.with(mContext, bean.images, (ImageView) holder.getView(R.id.iv_image));
-        ImageLoader.withCircle(mContext, bean.header, (ImageView) holder.getView(R.id.iv_header));
+        ImageLoader.getInstance().with(mContext, bean.images, (ImageView) holder.getView(R.id.iv_image));
+        ImageLoader.getInstance().withCircle(mContext, bean.header, (ImageView) holder.getView(R.id.iv_header));
         holder.setText(R.id.tv_text, bean.text);
         holder.setText(R.id.tv_up, bean.up);
         holder.setText(R.id.tv_name, bean.name);

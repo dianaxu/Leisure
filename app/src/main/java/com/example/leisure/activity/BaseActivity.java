@@ -105,18 +105,20 @@ public abstract class BaseActivity extends AppCompatActivity {
      */
     private void initStatusBar() {
         //通过设置全屏，设置状态栏透明
-        ScreenInfoUtils.fullScreen(this);
-        //初始化状态栏的高度
-        View bar = findViewById(getStatusBarId());
-        if (bar.getLayoutParams() instanceof ConstraintLayout.LayoutParams) {
-            ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(MATCH_PARENT, mStatusBarHeight);
-            bar.setLayoutParams(params);
-        } else if (bar.getLayoutParams() instanceof RelativeLayout.LayoutParams) {
-            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(MATCH_PARENT, mStatusBarHeight);
-            bar.setLayoutParams(params);
-        } else if (bar.getLayoutParams() instanceof LinearLayout.LayoutParams) {
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(MATCH_PARENT, mStatusBarHeight);
-            bar.setLayoutParams(params);
+        boolean isFullScreen = ScreenInfoUtils.fullScreen(this);
+        if (isFullScreen) {
+            //初始化状态栏的高度
+            View bar = findViewById(getStatusBarId());
+            if (bar.getLayoutParams() instanceof ConstraintLayout.LayoutParams) {
+                ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(MATCH_PARENT, mStatusBarHeight);
+                bar.setLayoutParams(params);
+            } else if (bar.getLayoutParams() instanceof RelativeLayout.LayoutParams) {
+                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(MATCH_PARENT, mStatusBarHeight);
+                bar.setLayoutParams(params);
+            } else if (bar.getLayoutParams() instanceof LinearLayout.LayoutParams) {
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(MATCH_PARENT, mStatusBarHeight);
+                bar.setLayoutParams(params);
+            }
         }
 
     }

@@ -17,6 +17,10 @@ import java.util.List;
 import androidx.annotation.NonNull;
 
 public class DownloadChapterAdapter extends BaseRecyclerViewAdapter<ComicChapterBean> {
+    public static final String UPDATE_ITEM_STATE = "update_item_state";
+    public static final String UPDATE_ITEM_PROGRESS = "update_item_progress";
+    public static final String UPDATE_ITEM_FINISH = "update_item_finish";
+    public static final String UPDATE_ITEM_FAIL = "update_item_fail";
 
     private List<Long> mLsPlay = new ArrayList<>();
     private List<Long> mLsPlause = new ArrayList<>();
@@ -89,10 +93,47 @@ public class DownloadChapterAdapter extends BaseRecyclerViewAdapter<ComicChapter
             @Override
             public void onClick(View v) {
                 long chapterId = (long) v.getTag();
-                v.setSelected(v.isSelected() ? false : true);
+                v.setSelected(!v.isSelected());
                 setCacheState(chapterId, v.isSelected());
             }
         });
+    }
+
+    @Override
+    protected void onBindView(BaseViewHolder holder, int position, List<Object> payloads) {
+        ComicChapterBean bean = mLsData.get(position);
+
+        TextView tvCount = (TextView) holder.getView(R.id.tv_count);
+        ImageView ivPlay = (ImageView) holder.getView(R.id.iv_play);
+        NumberProgressBar bar = (NumberProgressBar) holder.getView(R.id.pb_update_progress);
+
+        String state = (String) payloads.get(payloads.size() - 1);
+        Log.e(TAG, "chapter--> onBindView: pos" + position + ":" + state + ":" + bean.getCacheCount() + "max" + bean.getMaxCount());
+        int cacheState = bean.getCacheState();
+        switch (state) {
+            case UPDATE_ITEM_STATE:
+                ivPlay.setSelected(cacheState == Constant.DownloadState.DOWNLOADING);
+                break;
+            case UPDATE_ITEM_PROGRESS:
+                tvCount.setText(String.format("%1$d/%2$d", bean.getCacheCount(), bean.getMaxCount()));
+                if (bean.getMaxCount() != 0) {
+                    bar.setProgress(bean.getCacheCount() * 100 / bean.getMaxCount());
+                } else {
+                    bar.setProgress(0);
+                }
+
+                break;
+            case UPDATE_ITEM_FINISH:
+                ivPlay.setVisibility(View.GONE);
+                break;
+            case UPDATE_ITEM_FAIL:
+                ivPlay.setSelected(bean.getCacheState() == Constant.DownloadState.DOWNLOADING);
+                tvCount.setText("下载失败");
+                break;
+            default:
+                break;
+        }
+
     }
 
     /**
@@ -134,68 +175,16 @@ public class DownloadChapterAdapter extends BaseRecyclerViewAdapter<ComicChapter
         return position;
     }
 
-    /**
-     * 更新进度
-     *
-     * @param holder
-     * @param position   章节所在Adapter的位置
-     * @param chapterId  章节ID
-     * @param totalCount 下载的数量
-     * @param maxCount   总的数量
-     * @param isFinish   true 章节下载任务完成  totalCount=maxCount 则删除数据
-     */
-    public void updateProgress(BaseViewHolder holder, int position, long chapterId, int totalCount, int maxCount, boolean isFinish) {
-        Log.e(TAG, "updateProgress: " + chapterId + ":" + totalCount + ":" + maxCount);
-
-        if (position == -1) return;
-        mLsData.get(position).setCacheCount(totalCount);
-        mLsData.get(position).setMaxCount(maxCount);
-        //章节任务完成：
-        // totalCount=maxCount 则需要删除
-        // totalCount！=maxCount
-        //章节任务更新
-        //更新进度
-        //更新数字提示
-        if (isFinish) {
-            //全部下载完
-            if (totalCount == maxCount) {
-                mLsData.remove(position);
-                mLsPlay.remove(chapterId);
-                if (mListener != null) mListener.updateButtonText(hasPauseTask());
-                notifyItemRemoved(position);
-                return;
-            } else {
-                //任务走完，有部分图片未下载完,更改cachestate =cancel，updateButtonText = true
-                mLsData.get(position).setCacheState(Constant.DownloadState.DOWNLOAD_CANCEL);
-                mLsPlause.add(chapterId);
-                mLsPlay.remove(chapterId);
-                if (mListener != null) mListener.updateButtonText(hasPauseTask());
-            }
-        }
-
-        //对控件的值更新
-        if (holder != null) {
-            NumberProgressBar bar = (NumberProgressBar) holder.getView(R.id.pb_update_progress);
-            bar.setProgress(totalCount * 100 / maxCount);
-            holder.setText(R.id.tv_count, String.format("%1$d/%2$d", totalCount, maxCount));
-            if (isFinish && holder.getView(R.id.iv_play) != null) {
-                ImageView ivPlay = (ImageView) holder.getView(R.id.iv_play);
-                ivPlay.setSelected(false);
-            } else {
-                notifyItemChanged(position);
-            }
-        } else if (holder == null && isFinish) {
-            notifyItemChanged(position);
-        }
-    }
-
-    public void removeChapter(int position) {
-        mLsData.remove(position);
+    public void updateState(int position, int state) {
+        mLsData.get(position).setCacheState(state);
+        notifyItemChanged(position, UPDATE_ITEM_STATE);
     }
 
     //更新数据
     public void updateData(List<ComicChapterBean> list) {
+        if (list == null) return;
         this.mLsData = list;
+
         mLsPlay.clear();
         mLsPlause.clear();
         for (int i = 0; i < mLsData.size(); i++) {
@@ -204,8 +193,6 @@ public class DownloadChapterAdapter extends BaseRecyclerViewAdapter<ComicChapter
             else
                 mLsPlause.add(mLsData.get(i).get_id());
         }
-        Log.e(TAG, "updateData: " + mLsPlay.toString() + mLsPlause.toString());
-
         notifyDataSetChanged();
     }
 
@@ -236,7 +223,6 @@ public class DownloadChapterAdapter extends BaseRecyclerViewAdapter<ComicChapter
 
     //开启或者暂停所有任务
     public void playOrPauseAll() {
-        Log.e(TAG, "playOrPauseAll: " + mLsPlay.toString() + mLsPlause.toString());
         //有取消的任务--->开启所有任务
         if (hasPauseTask()) {
             startAllTask();
@@ -255,8 +241,8 @@ public class DownloadChapterAdapter extends BaseRecyclerViewAdapter<ComicChapter
         mLsPlause.addAll(mLsPlay);
         mLsPlay.clear();
         if (mListener != null) {
-            mListener.stopTask(chapters);
             mListener.updateButtonText(true);
+            mListener.stopTask(chapters);
         }
     }
 
@@ -269,8 +255,8 @@ public class DownloadChapterAdapter extends BaseRecyclerViewAdapter<ComicChapter
         mLsPlay.addAll(mLsPlause);
         mLsPlause.clear();
         if (mListener != null) {
-            mListener.startTask(chapters);
             mListener.updateButtonText(false);
+            mListener.startTask(chapters);
         }
     }
 }

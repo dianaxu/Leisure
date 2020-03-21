@@ -18,6 +18,9 @@ import java.util.List;
 import androidx.annotation.NonNull;
 
 public class DownloadComicAdapter extends BaseRecyclerViewAdapter<ComicBookBean> implements View.OnClickListener {
+    public static final String UPDATE_ITEM_STATE = "update_item_state";
+    public static final String UPDATE_ITEM_PROGRESS = "update_item_progress";
+    public static final String UPDATE_ITEM_FINISH = "update_item_finish";
 
     private int mCurrentDownloadBookId = 0; //当前正在下载的书
     private onTaskListener mTaskListener;
@@ -45,7 +48,7 @@ public class DownloadComicAdapter extends BaseRecyclerViewAdapter<ComicBookBean>
         ComicBookBean bean = mLsData.get(position);
 
         holder.setText(R.id.tv_name, bean.getName()); //书名
-        ImageLoader.with(mContext, bean.getCover(), (ImageView) holder.getView(R.id.iv_image)); //书图片
+        ImageLoader.getInstance().with(mContext, bean.getCover(), (ImageView) holder.getView(R.id.iv_image)); //书图片
         ImageView ivPlay = (ImageView) holder.getView(R.id.iv_play); //可暂停|下载
         ivPlay.setTag(position);
         WaveImageView waveImageView = (WaveImageView) holder.getView(R.id.wiv_view); //显示进度
@@ -57,7 +60,7 @@ public class DownloadComicAdapter extends BaseRecyclerViewAdapter<ComicBookBean>
             tvFinish.setVisibility(View.GONE);
             ivPlay.setVisibility(View.VISIBLE);
             ivPlay.setImageResource(R.drawable.pause);
-            waveImageView.startAnimation();
+
         } else if (cacheState == Constant.DownloadState.DOWNLOAD_CANCEL) {  //取消下载
             tvFinish.setVisibility(View.GONE);
             ivPlay.setVisibility(View.VISIBLE);
@@ -78,6 +81,53 @@ public class DownloadComicAdapter extends BaseRecyclerViewAdapter<ComicBookBean>
     }
 
     @Override
+    public void onBindView(BaseViewHolder holder, int position, List<Object> payloads) {
+        ComicBookBean bean = mLsData.get(position);
+        TextView tvFinish = (TextView) holder.getView(R.id.tv_finish);
+        ImageView ivPlay = (ImageView) holder.getView(R.id.iv_play);
+        WaveImageView waveImageView = (WaveImageView) holder.getView(R.id.wiv_view); //显示进度
+
+        String state = (String) payloads.get(payloads.size()-1);
+        int cacheState = bean.getCacheState();
+        switch (state) {
+            case UPDATE_ITEM_STATE:
+                if (cacheState == Constant.DownloadState.DOWNLOADING) {
+                    waveImageView.startAnimation();
+                    ivPlay.setVisibility(View.VISIBLE);
+                    ivPlay.setImageResource(R.drawable.pause);
+                } else if (cacheState == Constant.DownloadState.DOWNLOAD_CANCEL) {
+                    ivPlay.setVisibility(View.VISIBLE);
+                    ivPlay.setImageResource(R.drawable.play);
+                    waveImageView.stopAnimation();
+                } else {
+                    ivPlay.setVisibility(View.GONE);
+                    waveImageView.stopAnimation();
+                }
+                break;
+            case UPDATE_ITEM_PROGRESS:
+                waveImageView.setProgress((1.0f - bean.getProgress()));
+                if (!waveImageView.isRunning())
+                    waveImageView.startAnimation();
+                ivPlay.setImageResource(cacheState == Constant.DownloadState.DOWNLOADING ? R.drawable.pause : R.drawable.play);
+                break;
+            case UPDATE_ITEM_FINISH:
+                if (cacheState == Constant.DownloadState.DOWNLOADED) {
+                    tvFinish.setVisibility(View.VISIBLE);
+                    ivPlay.setVisibility(View.GONE);
+                    waveImageView.stopAnimation();
+                } else if (cacheState == Constant.DownloadState.DOWNLOAD_NOT) {
+                    ivPlay.setVisibility(View.GONE);
+                    if (!waveImageView.isRunning())
+                        waveImageView.stopAnimation();
+                }
+                break;
+            default:
+                break;
+        }
+
+    }
+
+    @Override
     public void onClick(View v) {
         if (R.id.iv_play == v.getId()) {
             int position = (int) v.getTag();
@@ -86,12 +136,12 @@ public class DownloadComicAdapter extends BaseRecyclerViewAdapter<ComicBookBean>
             if (bean.getCacheState() == Constant.DownloadState.DOWNLOADING) {
                 bean.setCacheState(Constant.DownloadState.DOWNLOAD_CANCEL);
                 if (mTaskListener != null) mTaskListener.stopTask(bean);
-                this.notifyItemChanged(position);
+                this.notifyItemChanged(position, UPDATE_ITEM_STATE);
             } else {
                 //开始这本书的缓存任务
                 bean.setCacheState(Constant.DownloadState.DOWNLOADING);
                 if (mTaskListener != null) mTaskListener.startTask(bean);
-                this.notifyItemChanged(position);
+                this.notifyItemChanged(position, UPDATE_ITEM_STATE);
             }
         }
     }
@@ -151,8 +201,6 @@ public class DownloadComicAdapter extends BaseRecyclerViewAdapter<ComicBookBean>
             WaveImageView imageView = (WaveImageView) holder.getView(R.id.wv_view);
             if (imageView != null) {
                 imageView.setProgress(progress);
-
-
             } else
                 notifyItemChanged(position);
 

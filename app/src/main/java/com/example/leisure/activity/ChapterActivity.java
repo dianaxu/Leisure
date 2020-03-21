@@ -7,6 +7,9 @@ import android.os.Bundle;
 import com.example.leisure.R;
 import com.example.leisure.activity.fragment.ChapterFragment;
 import com.example.leisure.db.greendao.ComicBookBean;
+import com.example.leisure.db.greendao.ComicChapterBean;
+
+import java.util.List;
 
 import androidx.annotation.Nullable;
 
@@ -45,8 +48,11 @@ public class ChapterActivity extends BaseActivity implements ChapterFragment.OnT
         setContentView(R.layout.activity_chapter);
 
         mBook = (ComicBookBean) getIntent().getSerializableExtra(BUNDLE_KEY_COMICBOOKBEAN);
+        List<ComicChapterBean> lsChapter = null;
+        if (mBook.lsChapter != null) lsChapter = mBook.lsChapter;
+        else if (mBook.getLsChapter() != null) lsChapter = mBook.getLsChapter();
 
-        ChapterFragment fragment = ChapterFragment.newInstance(mBook.lsChapter);
+        ChapterFragment fragment = ChapterFragment.newInstance(lsChapter);
         fragment.addChapterSelectedListener(this);
 
         getSupportFragmentManager()

@@ -1,13 +1,9 @@
 package com.example.leisure;
 
 import android.app.Application;
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
-import android.os.IBinder;
 
 import com.danikula.videocache.HttpProxyCacheServer;
 import com.example.leisure.db.greendao.DaoManager;
@@ -15,6 +11,7 @@ import com.example.leisure.greenDao.gen.DaoSession;
 import com.example.leisure.retrofit.RetrofitComicUtils;
 import com.example.leisure.retrofit.RetrofitUtils;
 import com.example.leisure.service.DownloadService;
+import com.example.leisure.test.TestService;
 import com.example.leisure.util.Constant;
 
 import java.io.File;
@@ -34,19 +31,19 @@ public class MainApplication extends Application {
 
     private DaoSession mDaoSession;
     private DownloadService mDownloadService;
-    private ServiceConnection mDownloadConn = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            isCon = true;
-            DownloadService.DownloadBinder iBinder = (DownloadService.DownloadBinder) service;
-            mDownloadService = iBinder.getService();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            isCon = false;
-        }
-    };
+//    private ServiceConnection mDownloadConn = new ServiceConnection() {
+//        @Override
+//        public void onServiceConnected(ComponentName name, IBinder service) {
+//            isCon = true;
+//            DownloadService.DownloadBinder iBinder = (DownloadService.DownloadBinder) service;
+//            mDownloadService = iBinder.getService();
+//        }
+//
+//        @Override
+//        public void onServiceDisconnected(ComponentName name) {
+//            isCon = false;
+//        }
+//    };
 
 
     public static MainApplication getInstance() {
@@ -61,8 +58,8 @@ public class MainApplication extends Application {
         initGreenDao();
         getBaseDataBySharedPref();
 
-        Intent intent = new Intent(this, DownloadService.class);
-        bindService(intent, mDownloadConn, BIND_AUTO_CREATE);
+//        Intent intent = new Intent(this, DownloadService.class);
+//        bindService(intent, mDownloadConn, BIND_AUTO_CREATE);
         super.onCreate();
         mApp = this;
     }
@@ -138,14 +135,22 @@ public class MainApplication extends Application {
         return mDaoSession;
     }
 
+
+    private TestService mTestService;
+
     public DownloadService getDownloadService() {
-        if (isCon) {
-            return mDownloadService;
-        }
-        return null;
+        return mDownloadService;
+    }
+
+    public TestService getTestService() {
+        return mTestService;
     }
 
     public boolean hasConnService() {
         return isCon;
+    }
+
+    public void saveService(TestService service) {
+        this.mTestService = service;
     }
 }

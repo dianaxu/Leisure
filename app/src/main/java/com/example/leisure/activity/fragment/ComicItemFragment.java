@@ -158,7 +158,7 @@ public class ComicItemFragment extends Fragment implements BaseRecyclerViewAdapt
                 ComicBookBean bean = mLsData.get(position);
 
                 holder.setText(R.id.tv_name, bean.getName());
-                ImageLoader.with(getContext(), bean.getCover(), (ImageView) holder.getView(R.id.iv_cover));
+                ImageLoader.getInstance().with(getContext(), bean.getCover(), (ImageView) holder.getView(R.id.iv_cover));
             }
         };
 
@@ -302,7 +302,7 @@ public class ComicItemFragment extends Fragment implements BaseRecyclerViewAdapt
     public void onClick(View v) {
         if (R.id.tv_retry == v.getId()) {
             getComic(Integer.parseInt(mComicItem.pages), true);
-            mTrlView.setVisibility(View.GONE);
+            mRlError.setVisibility(View.GONE);
         }
     }
 }

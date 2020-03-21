@@ -96,6 +96,9 @@ public class DownloadReceiver extends BroadcastReceiver {
     public static class ReceiverPromptBean implements Serializable {
         public String message;
         public long chapterId;
+        public long bookId;
+        public boolean isConnWifi;
+
     }
 
     public static class ReceiverCancelBean implements Serializable {
