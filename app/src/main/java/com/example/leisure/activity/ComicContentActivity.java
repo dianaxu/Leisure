@@ -9,7 +9,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.leisure.MainApplication;
 import com.example.leisure.R;
 import com.example.leisure.activity.adapter.ComicContentGroupedListAdapter;
 import com.example.leisure.activity.fragment.ChapterFragment;
@@ -65,7 +64,6 @@ public class ComicContentActivity extends BaseActivity implements View.OnClickLi
 
     private ChapterFragment menuFragment;
     private ComicContentPresenter mPresenter;
-    private DownloadService mService;
 
     public static void startComicContentActivity(Context context, ComicBookBean bean) {
         Intent intent = new Intent(context, ComicContentActivity.class);
@@ -89,6 +87,7 @@ public class ComicContentActivity extends BaseActivity implements View.OnClickLi
         ComicBookBean bean = (ComicBookBean) intent.getSerializableExtra(BUNDLE_KEY_COMICBOOKBEAN);
         mPresenter = new ComicContentPresenter(this, savedInstanceState, bean, this);
 
+
         initView();                   //初始化控件
         initMenu();                   //初始化章节
         initTwinklingRefreshLayout(); //初始化刷新控件
@@ -96,7 +95,7 @@ public class ComicContentActivity extends BaseActivity implements View.OnClickLi
 
         mCtbHeader.setText(mPresenter.getmBookName());
         mPresenter.getComicImages(mPresenter.getReadPosition(), true, true);  //获取漫画内容
-        mService = MainApplication.getInstance().getDownloadService();
+        mLsChapter = mPresenter.getLsChapter();
     }
 
     //初始化控件
@@ -218,7 +217,21 @@ public class ComicContentActivity extends BaseActivity implements View.OnClickLi
         });
     }
 
+
+    private void startService() {
+        Intent intent = new Intent(this, DownloadService.class);
+        startService(intent);
+    }
+
     private void updateGroupInserted(int position) {
+        if (position >= mLsChapter.size()) {
+            Toast.makeText(ComicContentActivity.this, "已到达最后一章", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (position <= 0) {
+            Toast.makeText(ComicContentActivity.this, "已到达第一章", Toast.LENGTH_SHORT).show();
+            return;
+        }
         if (mLsChapter.get(position).visible) return; //过滤已经显示着的
         if (hasNoData(position)) return; //过滤没有图片集
 
@@ -247,6 +260,7 @@ public class ComicContentActivity extends BaseActivity implements View.OnClickLi
     public void onDestroy() {
         mPresenter.cancleRequest();
         super.onDestroy();
+
     }
 
     @Override
@@ -287,12 +301,9 @@ public class ComicContentActivity extends BaseActivity implements View.OnClickLi
         Long bookId = mPresenter.getBookId();
         if (mPresenter.isAddBookShelf()) {
             mPresenter.updateState(isCacheAll);
-            mService.addTask(bookId);
+            startService();
         } else {
             mPresenter.addBookToDB(isCacheAll);
-            bookId = mPresenter.getBookId();
-            if (bookId != null)
-                mService.addTask(bookId);
         }
     }
 
@@ -375,11 +386,11 @@ public class ComicContentActivity extends BaseActivity implements View.OnClickLi
         mTrlView.finishRefreshing();
         mTrlView.finishLoadmore();
 
-        Toast.makeText(getParent(), errorMsg, Toast.LENGTH_LONG).show();
+        Toast.makeText(ComicContentActivity.this, errorMsg, Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void addComicSuccessToDB(long bookId) {
-        mService.addTask(bookId);
+        startService();
     }
 }

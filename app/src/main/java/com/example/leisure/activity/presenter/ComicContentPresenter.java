@@ -190,6 +190,8 @@ public class ComicContentPresenter {
             boolean haveDate = getComicImagesByDB(position);
             if (!haveDate) {
                 getComicImagesHttp(position);
+            }else{
+                if (mIView != null) mIView.updateUI(position, mBook.getLsChapter(), true, false);
             }
         } else {
             if (hasNoDataByHttp(position))

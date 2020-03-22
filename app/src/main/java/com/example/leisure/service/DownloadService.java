@@ -29,6 +29,7 @@ import java.util.Map;
 import androidx.annotation.Nullable;
 
 public class DownloadService extends Service implements DownloadTask.onDownLoadInterface {
+    public static final String BUNDLE_KEY_BOOKID = "key_bookid";
     private static final String TAG1 = "DownloadTask";
 
     private DaoSession mDaoSession;
@@ -66,7 +67,7 @@ public class DownloadService extends Service implements DownloadTask.onDownLoadI
 
 
     /**
-     * ----------------------------Service原生方法-------------------
+     * ----------------------------重写Service方法-------------------
      */
     public class DownloadBinder extends Binder {
 
@@ -85,6 +86,13 @@ public class DownloadService extends Service implements DownloadTask.onDownLoadI
         if (mLsTask == null || mLsTask.size() == 0) {
             mDaoSession = MainApplication.getInstance().getDaoSession();
             startTask();
+        } else {
+            if (intent != null) {
+                long bookId = intent.getLongExtra(BUNDLE_KEY_BOOKID, -1);
+                if (bookId != -1) {
+                    addTask(bookId);
+                }
+            }
         }
         return super.onStartCommand(intent, flags, startId);
     }
@@ -399,8 +407,6 @@ public class DownloadService extends Service implements DownloadTask.onDownLoadI
         //更新book
         updateBookCacheProgress(bean);
 
-        Log.e("finish", "onUpdateProgressChapter: state" + bean.getCacheState() + " : " + bean.getCacheCount());
-
         //发送信息
         sendUpdateProgressChapter(bean.get_id(), bean.getCacheCount(), bean.getMaxCount());
         sendUpdateProgressBook(bean.getBookId(), mBook.getProgress());
@@ -412,11 +418,9 @@ public class DownloadService extends Service implements DownloadTask.onDownLoadI
     @Override
     public void onFinishChapter(ComicChapterBean bean) {
         if (bean.getCacheCount() == bean.getMaxCount()) {
-            Log.e("finish", "onFinishChapter: ----> 1");
             bean.setIsCaching(true);
             bean.setCacheState(Constant.DownloadState.DOWNLOADED);
         } else {
-            Log.e("finish", "onFinishChapter: ----> cancel");
             bean.setCacheState(Constant.DownloadState.DOWNLOAD_CANCEL);
         }
         mDaoSession.update(bean);
