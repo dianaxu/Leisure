@@ -10,6 +10,7 @@
         style="@style/MyStatusBar"
         android:background="@color/chapterBg" />
 
+
     <FrameLayout
         android:id="@+id/fragment"
         android:layout_width="match_parent"

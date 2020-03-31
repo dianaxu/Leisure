@@ -23,7 +23,19 @@
     <declare-styleable name="WaveImageView">
         <attr name="wave_src" format="reference" />
         <attr name="wave_progress_color" format="reference" />
+    </declare-styleable>
 
+    <declare-styleable name="CountDownProgressView">
+        <attr name="progress_color" format="color" />
+        <attr name="progress_width" format="dimension" />
+        <attr name="corner" format="dimension" />
+        <attr name="max_time" format="integer" />
+        <attr name="time_interval" format="integer" />
+        <attr name="show_num" format="boolean" />
+        <attr name="progress_style" format="enum">
+            <enum name="rect" value="0" />
+            <enum name="circle" value="1" />
+        </attr>
     </declare-styleable>
 
 </resources>
