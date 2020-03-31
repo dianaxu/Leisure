@@ -36,4 +36,5 @@ public class TestCustomViewActivity extends AppCompatActivity {
         });
         view.startCountDown();
     }
+
 }

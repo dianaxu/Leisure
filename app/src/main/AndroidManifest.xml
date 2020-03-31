@@ -54,6 +54,30 @@
             </intent-filter>
         </activity>
         <activity android:name=".test.TestService1Activity" />
+        <activity android:name=".test.TestJPushActivity" />
+
+        <!-- 注册继承JCommonService的服务 -->
+        <service
+            android:name=".service.XService"
+            android:enabled="true"
+            android:exported="false"
+            android:process=":pushcore">
+            <intent-filter>
+                <action android:name="cn.jiguang.user.service.action" />
+            </intent-filter>
+        </service>
+
+        <!-- 替换原生极光推送接收器 -->
+        <receiver
+            android:name=".receiver.MyReceiver"
+            android:enabled="true"
+            android:exported="false"
+            tools:node="replace">
+            <intent-filter>
+                <action android:name="cn.jpush.android.intent.RECEIVE_MESSAGE" />
+                <category android:name="com.example.leisure" /> <!--JPush上注册的包名 -->
+            </intent-filter>
+        </receiver>
 
         <service android:name=".service.DownloadService" />
         <service android:name=".test.TestService" />

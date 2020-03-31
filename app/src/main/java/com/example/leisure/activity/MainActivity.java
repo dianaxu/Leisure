@@ -29,6 +29,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
+import cn.jpush.android.api.JPushInterface;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
@@ -89,6 +90,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         setToolbarTitle(mCurrentPage);
         setIvSearch(mCurrentPage);
         setCurrrentTab(mCurrentPage);
+
+        JPushInterface.setDebugMode(true);
+        JPushInterface.init(this);
     }
 
 
