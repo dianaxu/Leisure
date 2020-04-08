@@ -5,22 +5,69 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.example.leisure.widget.CountDownProgressView
-        android:id="@+id/cdpv_view"
+    <Button
+        android:id="@+id/btn_start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:layout_margin="@dimen/margin"
+
+        android:text="start" />
+
+    <!--    <com.example.leisure.widget.CountDownProgressView-->
+    <!--        android:id="@+id/cdpv_view"-->
+    <!--        android:layout_width="wrap_content"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_gravity="left"-->
+    <!--        android:layout_margin="@dimen/margin"-->
+    <!--        android:background="@drawable/bg_splash"-->
+    <!--        android:gravity="center"-->
+    <!--        android:padding="5dp"-->
+    <!--        android:textSize="20sp"-->
+    <!--        app:corner="8dp"-->
+    <!--        app:max_time="10000"-->
+    <!--        app:progress_color="@color/colorPrimary"-->
+    <!--        app:progress_style="rect"-->
+    <!--        app:progress_width="4dp"-->
+    <!--        app:show_num="true"-->
+    <!--        app:time_interval="130" />-->
+    <com.example.leisure.widget.XView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/imagePadding"
+        android:background="@drawable/bg_splash"
         android:gravity="center"
-        android:padding="5dp"
-        android:text="跳过"
+        android:padding="@dimen/imagePadding"
+        android:text="sdfsdjfkl" />
+
+    <com.example.leisure.widget.CountDownProgressView
+        android:id="@+id/cdpv_view1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:layout_margin="@dimen/margin"
+        android:background="@drawable/bg_splash"
+        android:gravity="center"
+        android:padding="@dimen/margin"
+        android:text=""
         android:textSize="20sp"
-        app:corner="8dp"
         app:max_time="10000"
         app:progress_color="@color/colorPrimary"
-        app:progress_style="rect"
-        app:progress_width="4dp"
+        app:progress_style="circle"
+        app:progress_width="2dp"
         app:show_num="true"
         app:time_interval="130" />
+
+    <AutoCompleteTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_cancel_icon_dark_gray"
+        android:padding="21dp"
+        android:text="sdfkjsdlf" />
+
+    <TextView
+        android:id="@+id/tv_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/Yellow"
+        android:text="3" />
 
 </LinearLayout>

@@ -141,7 +141,7 @@ public class WaveImageView extends View {
      *
      * @param measureSpec 测量模式和大小
      * @param defaultSize 默认的大小
-     * @return
+     * @return 
      */
     public int measureView(int measureSpec, int defaultSize) {
         int measureSize;
