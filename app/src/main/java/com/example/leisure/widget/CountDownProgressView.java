@@ -381,7 +381,7 @@ public class CountDownProgressView extends AppCompatTextView {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        canvas.drawColor(Color.WHITE);
+        canvas.drawColor(Color.TRANSPARENT);
 
         int layerID = canvas.saveLayer(0, 0, getWidth(), getHeight(), mBackgroudPaint, Canvas.ALL_SAVE_FLAG);
 

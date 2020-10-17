@@ -119,7 +119,7 @@ public class XView extends TextView {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        canvas.drawColor(Color.WHITE);
+        canvas.drawColor(Color.TRANSPARENT);
 
 
         int layerID = canvas.saveLayer(0, 0, width * 2, height * 2, mPaint, Canvas.ALL_SAVE_FLAG);
@@ -132,7 +132,7 @@ public class XView extends TextView {
 
 
         canvas.restoreToCount(layerID);
-        canvas.drawRoundRect(new RectF(0, 0, getWidth(), getHeight()), 5f, 5f, mBoardPaint);
+        canvas.drawRoundRect(new RectF(0, 0, getWidth(), getHeight()), 20f, 20f, mBoardPaint);
         super.onDraw(canvas);
     }
 }

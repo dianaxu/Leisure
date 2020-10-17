@@ -20,6 +20,8 @@ import com.example.leisure.retrofit.RetrofitComicUtils;
 import com.example.leisure.retrofit.RxHelper;
 import com.example.leisure.util.Constant;
 
+import java.util.Collections;
+
 public class ComicDetailPresenter {
     private static final String BUNDLE_KEY_DATA = "key_data";
     private static final String BUNDLE_KEY_ISADDBOOKSHELF = "key_isaddbookshelf";
@@ -129,6 +131,8 @@ public class ComicDetailPresenter {
                 }
                 mBook = result.data;
                 mBook.setUrl(mhurl1);
+
+                Collections.reverse(result.list);
                 mBook.lsChapter = result.list;
                 //更新界面
                 if (isUpdateUi)

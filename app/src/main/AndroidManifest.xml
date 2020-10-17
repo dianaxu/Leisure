@@ -42,10 +42,9 @@
         <activity android:name=".activity.LogonActivity" />
         <activity android:name=".activity.FindPwdActivity" />
         <activity android:name=".activity.LogonDevelopActivity" />
-        <activity android:name=".activity.MainActivity" />
-
-        <activity
-            android:name=".test.TestCustomViewActivity"
+        <!--        <activity-->
+        <!--            android:name=".test.TestCustomViewActivity"-->
+        <activity android:name=".activity.MainActivity"
             android:theme="@style/ThemeSplash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

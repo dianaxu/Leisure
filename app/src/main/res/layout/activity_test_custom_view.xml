@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
+    android:background="@color/Yellow"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
@@ -12,23 +13,6 @@
 
         android:text="start" />
 
-    <!--    <com.example.leisure.widget.CountDownProgressView-->
-    <!--        android:id="@+id/cdpv_view"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_gravity="left"-->
-    <!--        android:layout_margin="@dimen/margin"-->
-    <!--        android:background="@drawable/bg_splash"-->
-    <!--        android:gravity="center"-->
-    <!--        android:padding="5dp"-->
-    <!--        android:textSize="20sp"-->
-    <!--        app:corner="8dp"-->
-    <!--        app:max_time="10000"-->
-    <!--        app:progress_color="@color/colorPrimary"-->
-    <!--        app:progress_style="rect"-->
-    <!--        app:progress_width="4dp"-->
-    <!--        app:show_num="true"-->
-    <!--        app:time_interval="130" />-->
     <com.example.leisure.widget.XView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -55,6 +39,11 @@
         app:progress_width="2dp"
         app:show_num="true"
         app:time_interval="130" />
+
+    <com.example.leisure.widget.XView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_splash"/>
 
     <AutoCompleteTextView
         android:layout_width="wrap_content"
